@@ -31,6 +31,7 @@ if __name__ == '__main__':
 \begin{minted}{python}
 from pathlib import Path
 import numpy as np
+from utils import normalize_angle
 
 def load_tds_data(filepath):
     """
@@ -61,9 +62,7 @@ def parse_filename(filename: str):
     bg_name = parts[3]
     
     # Нормализуем угол первого ротатора (диапазон -180...180 градусов)
-    angle1 = angle1 % 360
-    if angle1 > 180:
-        angle1 -= 360
+    angle1 = normalize_angle(angle1)
         
     return angle1, angle2, repetition, bg_name
 
