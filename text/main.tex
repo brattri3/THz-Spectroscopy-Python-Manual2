@@ -1,0 +1,43 @@
+% ============================================================
+% main.tex - Главный файл методического пособия
+% Собирает все разделы в единый документ
+% ============================================================
+% !TeX program = xelatex
+% Компиляция: xelatex --shell-escape main.tex
+
+\documentclass{article}
+
+% Подключаем наш стилевой файл (он содержит все настройки)
+\usepackage{myconfig}
+
+\begin{document}
+	
+	% Титульный лист
+	\input{title}
+	
+	% Оглавление (генерируется автоматически)
+	\tableofcontents
+	\newpage
+	
+	% Введение
+	\input{introduction}
+	
+	% Основные разделы
+	\input{section1_preparation}
+	\input{section2_structure}
+	\input{section3_loading}
+	\input{section4_processing}
+	\input{section5_interactivity}
+	\input{section5_theory}
+	\input{section6_angular}
+	\input{section7_optimization}
+	\input{section8_analysis}
+	\input{section9_final}
+	
+	% Заключение и библиография (можно добавить позже)
+	\input{conclusion}
+	
+	% Приложения
+	\input{appendix}
+	
+\end{document}

@@ -1,0 +1,60 @@
+% ============================================================
+% ПРЕАМБУЛА
+% ============================================================
+% Преамбула — это служебная часть документа, которая настраивает
+% его внешний вид и подключает необходимые пакеты. Здесь мы:
+%   1. Задаём кодировку и язык документа.
+%   2. Устанавливаем геометрию страницы (поля, размер бумаги).
+%   3. Подключаем пакеты для работы с математикой, графикой,
+%      листингами кода, гиперссылками и цветами.
+%   4. Настраиваем стиль отображения кода Python.
+%   5. Определяем команды для оформления примечаний и предупреждений.
+
+
+% Кодировка и язык
+\usepackage[utf8]{inputenc}           % поддержка UTF-8 (русские буквы)
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}           % русский язык в документе
+
+% Математика и символы
+\usepackage{amsmath, amssymb}         % расширенные математические возможности
+\usepackage{bm}                       % жирные символы в математике
+
+% Геометрия страницы
+\usepackage{geometry}
+\geometry{
+	top=2cm,
+	bottom=2cm,
+	left=2.5cm,
+	right=2.5cm
+}
+
+% Графика и плавающие объекты
+\usepackage{graphicx}                 % вставка изображений
+\usepackage{float}                    % управление плавающими объектами
+\usepackage{caption}                  % настройка подписей
+\usepackage{subcaption}               % подписи для подрисунков
+
+% Списки
+\usepackage{enumitem}                 % гибкие списки
+
+% Цвета
+\usepackage{color}
+\usepackage{xcolor}                   % расширенная работа с цветами
+
+% Гиперссылки
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	urlcolor=blue,
+	citecolor=blue
+}
+
+
+\usepackage[dvipsnames]{xcolor}
+
+% Команды для оформления примечаний
+\newcommand{\note}[1]{\textcolor{RoyalBlue}{\textbf{Примечание:} #1}}
+\newcommand{\warning}[1]{\textcolor{BurntOrange}{\textbf{Важно:} #1}}
+\newcommand{\tip}[1]{\textcolor{ForestGreen}{\textbf{Совет:} #1}}

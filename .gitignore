@@ -1,0 +1,44 @@
+node_modules/
+build/
+dist/
+coverage/
+images/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Игнорируем базовые файлы шаблона AI Studio (фронтенд)
+/src/
+/assets/
+index.html
+package.json
+package-lock.json
+vite.config.ts
+tsconfig.json
+metadata.json
+
+# Игнорируем исходники Python (справочные материалы)
+/code/
+
+# LaTeX temporary files
+*.aux
+*.pdf
+*.log
+*.toc
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.lot
+*.lof
+_minted*/
+_minted-main/
+
+
+# Разрешаем загрузку только папки /text/, конфигураций и документации
+!/text/
+!AGENTS.md
+!README.md

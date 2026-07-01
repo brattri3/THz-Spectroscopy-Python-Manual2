@@ -1,0 +1,271 @@
+% myconfig.sty
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{myconfig}[2023/12/01 Custom configuration for OPUS-NT documentation]
+
+% ==================== ENGINE DETECTION ====================
+\RequirePackage{iftex}
+
+\ifPDFTeX
+% Для pdflatex
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T2A]{fontenc}
+\RequirePackage[english, russian]{babel}
+\else
+% Для xelatex и lualatex
+\RequirePackage{fontspec}
+% Используем babel вместо polyglossia — он надёжнее и не требует доп. шрифтов
+\RequirePackage[english, russian]{babel}
+
+% Задаём шрифты (используем стандартные системные имена без расширений)
+% Если этих шрифтов нет, замените на: Liberation Serif, Liberation Mono, Arial
+\setmainfont{Times New Roman}
+\setmonofont{Courier New}
+\setsansfont{Arial}
+\fi
+
+% ==================== BASIC PACKAGES ====================
+\RequirePackage{indentfirst}
+
+% ==================== MATH PACKAGES ====================
+\RequirePackage{amsmath, amssymb, amsfonts}
+\RequirePackage{bm}
+
+% ==================== TABLE SUPPORT ====================
+\RequirePackage{tabularx}
+\RequirePackage{longtable}
+\RequirePackage[table]{xcolor}
+\definecolor{lightgray}{RGB}{240,240,240}
+
+% ==================== COLORS (with dvipsnames) ====================
+\RequirePackage[dvipsnames]{xcolor}   % добавляем dvipsnames для RoyalBlue и др.
+
+% ==================== GRAPHICS SUPPORT ====================
+\RequirePackage{graphicx}
+\RequirePackage{ifthen}
+
+% ==================== IMAGE SCALING ====================
+\newlength{\imgwidth}
+\newcommand{\autoscale}[2][0.8]{%
+	\settowidth{\imgwidth}{\includegraphics{#2}}%
+	\ifdim\imgwidth>#1\textwidth
+	\includegraphics[width=#1\textwidth]{#2}%
+	\else
+	\includegraphics{#2}%
+	\fi
+}
+
+% ==================== PARAGRAPH SETTINGS ====================
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1em}
+
+% ==================== PAGE LAYOUT ====================
+\RequirePackage{geometry}
+\geometry{
+	left=3cm,
+	right=2cm,
+	top=2cm,
+	bottom=2cm,
+	headheight=1cm,
+	footskip=1cm
+}
+
+% ==================== HEADING FORMATTING ====================
+\RequirePackage{titlesec}
+\titleformat{\section}
+{\bfseries\Large}
+{\hspace{-1.5cm}\thesection.}
+{1em}
+{}
+
+\titleformat{\subsection}
+{\bfseries\large}
+{\hspace{-0.5cm}\thesubsection.}
+{1em}
+{}
+
+\titleformat{\subsubsection}
+{\bfseries}
+{\hspace{0cm}\thesubsubsection.}
+{1em}
+{}
+
+% ==================== LIST SETTINGS ====================
+\RequirePackage{enumitem}
+\RequirePackage{multicol}
+\setlist[description]{style=nextline, leftmargin=1.5cm, noitemsep, topsep=2pt}
+
+% ==================== CUSTOM TEXT COMMANDS ====================
+\RequirePackage[many]{tcolorbox}
+\newtcolorbox{minitaskbox}[1][]{%
+	enhanced,
+	colback=RoyalBlue!5,
+	colframe=RoyalBlue,
+	boxrule=1pt,
+	arc=4pt,
+	left=10pt,
+	right=10pt,
+	top=10pt,
+	bottom=10pt,
+	title={\textbf{🔬 Практическое мини-задание}},
+	coltitle=RoyalBlue,
+	attach boxed title to top left={xshift=10pt, yshift=-10pt},
+	boxed title style={colback=white, colframe=RoyalBlue},
+	#1
+}
+
+\newcommand{\minitask}[1]{%
+	\begin{minitaskbox}
+		#1
+	\end{minitaskbox}
+}
+
+\newcommand{\mybold}[1]{%
+	\vspace{0.5em}%
+	\noindent\textbf{#1}%
+	\vspace{0.3em}%
+}
+
+% ==================== HYPHENATION SETTINGS ====================
+\hyphenpenalty=500
+\tolerance=200
+
+% ==================== FIGURE REFERENCES ====================
+\newcommand{\figref}[1]{Рис.~\ref{#1}}
+
+% ==================== COUNTER SETTINGS ====================
+%\setcounter{figure}{0}
+%\setcounter{section}{4}
+
+% ==================== HYPERREFERENCES ====================
+\RequirePackage[unicode=true, hidelinks]{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=black,
+	urlcolor=blue,
+	pdftitle={OPUS-NT Documentation},
+	pdfauthor={Author},
+	bookmarksdepth=3,
+	bookmarksnumbered=true
+}
+
+% ==================== PAGE NUMBERING ====================
+\RequirePackage{etoolbox}
+\pretocmd{\tableofcontents}{\clearpage\pagenumbering{gobble}}{}{}
+\apptocmd{\tableofcontents}{\clearpage\pagenumbering{arabic}\setcounter{page}{1}}{}{}
+
+% ==================== PREVENT WIDOW/ORPHAN HEADINGS ====================
+\RequirePackage{needspace}
+
+% ==================== BILINGUAL HEADINGS WITH EXACT ALIGNMENT ====================
+\newcommand{\bilingualsection}[2]{%
+	\needspace{15\baselineskip}%
+	\section[#1]{\texorpdfstring{#1}{#2}}%
+	\vspace{-1.2em}%
+	{\par\noindent\hspace{\dimexpr-0.8em\relax}\bfseries\Large #2\par}%
+	\vspace{0.3em}%
+}
+
+\newcommand{\bilingualsubsection}[2]{%
+	\needspace{15\baselineskip}%
+	\subsection[#1]{\texorpdfstring{#1}{#2}}%
+	\vspace{-1.2em}%
+	{\par\noindent\hspace{\dimexpr2.8em\relax}\bfseries\large #2\par}%
+	\vspace{0.2em}%
+}
+
+\newcommand{\bilingualsubsubsection}[2]{%
+	\needspace{10\baselineskip}%
+	\subsubsection[#1]{\texorpdfstring{#1}{#2}}%
+	\vspace{-0.8em}%
+	{\par\noindent\hspace{\dimexpr4em\relax}\bfseries #2\par}%
+	\vspace{0.1em}%
+}
+
+% ==================== MINTED SETTINGS ====================
+\RequirePackage{minted}
+\RequirePackage{caption}    % для подписей
+\captionsetup[listing]{hypcap=false}
+
+\setminted{
+	frame=single,
+	framesep=2mm,
+	baselinestretch=1.2,
+	fontsize=\footnotesize,
+	tabsize=4,
+	breaklines,
+	autogobble,
+	style=friendly
+}
+
+% Корректировка цвета комментариев для лучшей контрастности на белом фоне листа.
+% Исходный блеклый цвет в friendly (0.38, 0.63, 0.69) заменяется на глубокий контрастный сине-зеленый (0.10, 0.29, 0.34) и делается жирным.
+\makeatletter
+\AtBeginDocument{
+	\expandafter\def\csname PYGfriendly@tok@c\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.10,0.29,0.34}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@ch\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.10,0.29,0.34}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@cm\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.10,0.29,0.34}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@cp\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.10,0.29,0.34}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@cpf\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.10,0.29,0.34}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@cs\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.10,0.29,0.34}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@c1\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.10,0.29,0.34}{\textbf{##1}}}}
+	%
+	% Корректировка шрифта строк (String tokens) — делаем их жирными (bold) для лучшей читаемости и выразительности.
+	\expandafter\def\csname PYGfriendly@tok@s\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@sa\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@sb\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@sc\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@dl\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@sd\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@s2\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@se\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@sh\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@si\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@sx\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@sr\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@s1\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+	\expandafter\def\csname PYGfriendly@tok@ss\endcsname{\let\PYG@it=\relax\def\PYG@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{\textbf{##1}}}}
+}
+\makeatother
+
+% ==================== NOTES / WARNINGS / TIPS ====================
+\newcommand{\note}[1]{\textcolor{RoyalBlue}{\textbf{Примечание:} #1}}
+\newcommand{\warning}[1]{\textcolor{BurntOrange}{\textbf{Важно:} #1}}
+\newcommand{\tip}[1]{\textcolor{ForestGreen}{\textbf{Совет:} #1}}
+
+% ==================== PLACEHOLDERS & SMART FIGURES ====================
+\newcommand{\smartfigure}[3]{%
+	\begin{figure}[htbp]
+		\centering
+		\IfFileExists{images/#1}{%
+			\includegraphics[width=0.8\textwidth]{images/#1}%
+		}{%
+			\fbox{\parbox{0.8\textwidth}{
+				\centering
+				\vspace{1.5cm}
+				\textbf{\textsf{Место для изображения: images/#1}} \\
+				\vspace{0.5cm}
+				\textit{#2}
+				\vspace{1.5cm}
+			}}
+		}
+		\caption{#2}
+		\label{#3}
+	\end{figure}
+}
+
+\newcommand{\placeholderfigure}[2]{%
+	\begin{figure}[htbp]
+		\centering
+		\fbox{\parbox{0.8\textwidth}{
+			\centering
+			\vspace{1.5cm}
+			\textbf{\textsf{Место для скриншота #1}} \\
+			\vspace{0.5cm}
+			\textit{#2}
+			\vspace{1.5cm}
+		}}
+		\caption{Скриншот #1}
+	\end{figure}
+}
+
+\endinput
