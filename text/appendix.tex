@@ -27,6 +27,41 @@ if __name__ == '__main__':
     print(f"Путь к данным: {DATA_DIR}")
 \end{minted}
 
+\section{Полный листинг utils.py} \label{app:utils}
+\begin{minted}{python}
+def normalize_angle_conditional(angle: float) -> float:
+    """
+    Приводит произвольный угол к симметричному диапазону [-180, 180] градусов
+    с использованием классического логического ветвления (if/else).
+    """
+    # 1. Ограничиваем угол диапазоном [0, 360) градусов
+    angle = angle % 360.0
+    
+    # 2. Если угол зашел во вторую половину круга, переводим в отрицательную шкалу
+    if angle > 180.0:
+        angle -= 360.0  # тождественно: angle = angle - 360.0
+        
+    return angle
+
+
+def normalize_angle(angle: float) -> float:
+    """
+    Приводит произвольный угол к симметричному диапазону [-180, 180] градусов
+    с использованием компактной арифметической формулы с остатком от деления.
+    """
+    return ((angle + 180.0) % 360.0) - 180.0
+
+
+if __name__ == "__main__":
+    # Быстрый тест работоспособности функций
+    test_angles = [0.0, 90.0, 180.0, 270.0, 360.0, 730.0, -45.0]
+    print("Проверка математической нормализации углов:")
+    for a in test_angles:
+        norm_cond = normalize_angle_conditional(a)
+        norm_math = normalize_angle(a)
+        print(f"Исходный: {a:>6.1f}° | Ветвление: {norm_cond:>6.1f}° | Формула: {norm_math:>6.1f}°")
+\end{minted}
+
 \section{Полный листинг data\_loader.py} \label{app:data_loader}
 \begin{minted}{python}
 from pathlib import Path
