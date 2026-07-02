@@ -9,7 +9,7 @@ images/
 !.env.example
 
 # Игнорируем базовые файлы шаблона AI Studio (фронтенд)
-/src/
+# /src/  <-- Сняли игнорирование, так как теперь здесь живут наши Python-скрипты
 /assets/
 index.html
 package.json
@@ -17,6 +17,12 @@ package-lock.json
 vite.config.ts
 tsconfig.json
 metadata.json
+
+# Игнорируем кэш Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
 # Игнорируем исходники Python (справочные материалы)
 /code/
@@ -38,7 +44,9 @@ _minted*/
 _minted-main/
 
 
-# Разрешаем загрузку только папки /text/, конфигураций и документации
+# Разрешаем загрузку только папки /text/, рабочей папки /src/, конфигураций и документации
 !/text/
+!/src/
 !AGENTS.md
 !README.md
+!PLANNER.md
