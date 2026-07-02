@@ -142,40 +142,10 @@ def load_dataset_to_store(data_dir):
             
     return data_store
 
-# <<< [РЕШЕНИЕ МИНИ-ЗАДАНИЯ 1b]: НАЧАЛО >>>
-def run_time_domain_averaging_experiment(data_store, angle1, angle2):
-    """
-    Усредняет сигналы во временной области для демонстрации эффекта джиттера.
-    """
-    # Находим все повторения для заданных углов
-    signals_to_avg = []
-    t_base = None
-    
-    for key, val in data_store.items():
-        tag, a1, a2, rep = key
-        if tag == 'signal_raw' and a1 == angle1 and a2 == angle2:
-            t_base, E = val
-            signals_to_avg.append(E)
-            
-    if not signals_to_avg:
-        return
-        
-    # Усредняем по колонкам во временной области
-    E_averaged = np.mean(signals_to_avg, axis=0)
-    
-    # Сохраняем под кастомным тегом в СУБД
-    data_store[('signal_averaged_time', angle1, angle2, None)] = (t_base, E_averaged)
-    print(f"Эксперимент 1b: Усреднено {len(signals_to_avg)} сигналов во временной области для углов ({angle1}, {angle2}).")
-# <<< [РЕШЕНИЕ МИНИ-ЗАДАНИЯ 1b]: КОНЕЦ >>>
-
 if __name__ == '__main__':
     import config
     data_store = load_dataset_to_store(config.DATA_DIR)
     print(f"Загружено записей в data_store: {len(data_store)}")
-    
-    # Тест мини-задания 1b
-    run_time_domain_averaging_experiment(data_store, 10.0, 0.0)
-    print(f"Кастомный тег добавлен: {('signal_averaged_time', 10.0, 0.0, None) in data_store}")
 \end{minted}
 
 \section{Полный листинг spectrum.py} \label{app:spectrum}
