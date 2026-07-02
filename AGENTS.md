@@ -32,7 +32,7 @@ You are a team of experts working on creating a methodological guide for process
 
 ## Workflow Constraints
 - ALL code listings MUST use `minted`.
-- Use macros from `myconfig.sty` (e.g., `\note{}`, `\warning{}`, `\tip{}`, `\smartfigure{}`).
+- Use macros from `myconfig.sty` (e.g., `\note{}`, `\warning{}`, `\tip{}`, `\smartfigure{}`). **CRITICAL: Never use empty lines (paragraph breaks) inside the arguments of `\note{}`, `\warning{}`, or `\tip{}`. Use `\\` for line breaks if necessary. Empty lines will cause fatal `Paragraph ended before \@textcolor was complete` errors during LaTeX compilation.**
 - ALWAYS consult and update `/text/figures_index.md` when adding new images to maintain `figX.Y.png` numbering.
 - Explain every significant line of code (Progressive Disclosure).
 - Ensure the LaTeX compiles seamlessly.

@@ -228,13 +228,13 @@
 \makeatother
 
 % ==================== NOTES / WARNINGS / TIPS ====================
-\newcommand{\note}[1]{\textcolor{RoyalBlue}{\textbf{Примечание:} #1}}
-\newcommand{\warning}[1]{\textcolor{BurntOrange}{\textbf{Важно:} #1}}
-\newcommand{\tip}[1]{\textcolor{ForestGreen}{\textbf{Совет:} #1}}
+\long\def\note#1{{\color{RoyalBlue}\textbf{Примечание:} #1}}
+\long\def\warning#1{{\color{BurntOrange}\textbf{Важно:} #1}}
+\long\def\tip#1{{\color{ForestGreen}\textbf{Совет:} #1}}
 
 % ==================== PLACEHOLDERS & SMART FIGURES ====================
 \newcommand{\smartfigure}[3]{%
-	\begin{figure}[htbp]
+	\begin{figure}[H]
 		\centering
 		\IfFileExists{images/#1}{%
 			\includegraphics[width=0.8\textwidth]{images/#1}%
@@ -254,7 +254,7 @@
 }
 
 \newcommand{\placeholderfigure}[2]{%
-	\begin{figure}[htbp]
+	\begin{figure}[H]
 		\centering
 		\fbox{\parbox{0.8\textwidth}{
 			\centering
