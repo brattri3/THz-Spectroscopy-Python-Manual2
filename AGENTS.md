@@ -32,6 +32,9 @@ You are a team of experts working on creating a methodological guide for process
 
 ## Workflow Constraints
 - ALL code listings MUST use `minted`.
+- **Escaping LaTeX Special Characters (CRITICAL)**:
+  - Always escape special characters such as `_` (underscore), `%` (percent), `&` (ampersand), `#` (hash), `$` (dollar sign), `{`, and `}` in plain text, section titles (`\section`, `\subsection`), table of contents, captions, and labels.
+  - Underscores (`_`) inside file names, variable names, or any normal text MUST be escaped as `\_` (for example, write `data\_loader.py`, or inside typewriter font as `\texttt{data\_loader.py}`). Unescaped underscores will be interpreted as subscript triggers in math mode, causing fatal compilation errors (e.g., `Missing $ inserted` in `main.toc` or during compilation).
 - Use macros from `myconfig.sty` (e.g., `\note{}`, `\warning{}`, `\tip{}`, `\smartfigure{}`). **CRITICAL: Never use empty lines (paragraph breaks) inside the arguments of `\note{}`, `\warning{}`, or `\tip{}`. Use `\\` for line breaks if necessary. Empty lines will cause fatal `Paragraph ended before \@textcolor was complete` errors during LaTeX compilation.**
 - **No code duplication in Appendix (Executable Python Files)**: All Python scripts listed in the appendices MUST be stored as real, executable `.py` files in the `src/` folder of the project (e.g., `src/config.py`, `src/utils.py`). The corresponding appendix `.tex` files MUST load these files dynamically using `\inputminted{python}{../src/<filename>.py}` instead of copy-pasting the full code blocks into the LaTeX document. This ensures that the code can be easily run/tested directly and eliminates synchronization errors.
 - ALWAYS consult and update `/text/figures_index.md` when adding new images to maintain `figX.Y.png` numbering.
