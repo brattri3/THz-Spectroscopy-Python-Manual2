@@ -89,6 +89,63 @@ def calculate_transmission(t_sig: np.ndarray, E_sig: np.ndarray,
     return freqs, spec_sig, spec_bg, transmission
 
 
+def process_dataset(data_store: dict) -> dict:
+    """
+    Выполняет пакетную обработку всей базы данных.
+    Для каждой уникальной пары углов (angle1, angle2):
+      1. Находит все повторения.
+      2. Для каждого повторения рассчитывает спектр сигнала, спектр фона и пропускание.
+      3. Усредняет спектр пропускания и спектр фона по всем повторениям для компенсации дрейфа.
+      4. Сохраняет усредненные результаты в исходный словарь под новыми тегами:
+         ('spec_avg', angle1, angle2, None) -> (freqs, transmission_avg)
+         ('spec_bg_avg', angle1, angle2, None) -> (freqs, spec_bg_avg)
+    """
+    # Шаг 1. Найдем все уникальные пары углов (angle1, angle2) в сырых данных
+    angle_pairs = set()
+    for key in data_store.keys():
+        if key[0] == 'signal_raw':
+            angle_pairs.add((key[1], key[2]))
+            
+    # Шаг 2. Для каждой пары углов проводим обработку
+    for angle1, angle2 in sorted(angle_pairs):
+        transmissions = []
+        bg_spectra = []
+        freqs_common = None
+        
+        # Находим все повторения для данной пары углов
+        reps = [key[3] for key in data_store.keys() 
+                if key[0] == 'signal_raw' and key[1] == angle1 and key[2] == angle2]
+                
+        for rep in sorted(reps):
+            sig_key = ('signal_raw', angle1, angle2, rep)
+            bg_key = ('bg_raw', angle1, angle2, rep)
+            
+            if bg_key in data_store:
+                t_sig, E_sig = data_store[sig_key]
+                t_bg, E_bg = data_store[bg_key]
+                
+                # Рассчитываем пропускание для конкретной реплики
+                freqs, spec_sig, spec_bg, transmission = calculate_transmission(
+                    t_sig, E_sig, t_bg, E_bg
+                )
+                
+                transmissions.append(transmission)
+                bg_spectra.append(spec_bg)
+                if freqs_common is None:
+                    freqs_common = freqs
+                    
+        if transmissions:
+            # Усредняем по всем повторениям (ось 0)
+            trans_avg = np.mean(transmissions, axis=0)
+            bg_avg = np.mean(bg_spectra, axis=0)
+            
+            # Сохраняем результаты в базу данных с Repetition = None
+            data_store[('spec_avg', angle1, angle2, None)] = (freqs_common, trans_avg)
+            data_store[('spec_bg_avg', angle1, angle2, None)] = (freqs_common, bg_avg)
+            
+    return data_store
+
+
 if __name__ == '__main__':
     # Импортируем matplotlib локально для тестов
     import matplotlib
