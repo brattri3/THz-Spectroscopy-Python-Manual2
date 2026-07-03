@@ -5,8 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 
 # --- ПАРАМЕТРЫ ЦИФРОВОЙ ОБРАБОТКИ (DSP) ---
-PAD_FACTOR = 4
-SIGMA_PS = 5.0
+SIGMA_PS = 20.0
 F_MIN = 0.1
 F_MAX = 2.0
 
