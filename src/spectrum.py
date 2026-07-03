@@ -18,17 +18,21 @@ def find_peak_center(E: np.ndarray) -> int:
     return int(np.argmax(np.abs(E)))
 
 
-def apply_gaussian_window(t: np.ndarray, E: np.ndarray, sigma_ps: float = None) -> tuple[np.ndarray, np.ndarray]:
+def apply_gaussian_window(t: np.ndarray, E: np.ndarray, sigma_ps: float = None, peak_idx: int = None) -> tuple[np.ndarray, np.ndarray]:
     """
     Создает Гауссово окно с заданной полушириной sigma_ps (в пикосекундах)
-    вокруг главного временного пика сигнала и перемножает его с сигналом.
+    вокруг временного пика сигнала и перемножает его с сигналом.
     
+    Если параметр peak_idx не задан, положение пика находится автоматически 
+    по максимуму абсолютного значения сигнала E с помощью find_peak_center.
     Если параметр sigma_ps не задан, используется стандартное значение из config.SIGMA_PS.
     """
     if sigma_ps is None:
         sigma_ps = config.SIGMA_PS
         
-    peak_idx = find_peak_center(E)
+    if peak_idx is None:
+        peak_idx = find_peak_center(E)
+        
     t_peak = t[peak_idx]
     
     # Формула Гауссова распределения: exp(- (t - t_peak)^2 / (2 * sigma^2))
@@ -52,8 +56,7 @@ def compute_spectrum(t: np.ndarray, E: np.ndarray) -> tuple[np.ndarray, np.ndarr
     # Модуль комплексного числа дает амплитуду спектральной гармоники
     amplitude_spectrum = np.abs(spectrum_complex)
     
-    # Генерация честной шкалы частот.
-    # Так как dt задан в пикосекундах (1e-12 с), частоты freqs будут строго в ТГц (1e12 Гц)
+    # Генерируем шкалу частот в ТГц (так как dt задан в пикосекундах, f = 1/dt будет в ТГц)
     freqs = rfftfreq(N, d=dt)
     
     return freqs, amplitude_spectrum
@@ -67,9 +70,12 @@ def calculate_transmission(t_sig: np.ndarray, E_sig: np.ndarray,
     E_sig_clean = remove_dc(E_sig)
     E_bg_clean = remove_dc(E_bg)
     
-    # 2. Наложение временного Гауссова окна
-    E_sig_win, _ = apply_gaussian_window(t_sig, E_sig_clean)
-    E_bg_win, _ = apply_gaussian_window(t_bg, E_bg_clean)
+    # Поиск центра пика по опорному сигналу (фона) как золотой стандарт
+    peak_idx = find_peak_center(E_bg_clean)
+    
+    # 2. Наложение временного Гауссова окна (центрированного по пику опорного сигнала)
+    E_sig_win, _ = apply_gaussian_window(t_sig, E_sig_clean, peak_idx=peak_idx)
+    E_bg_win, _ = apply_gaussian_window(t_bg, E_bg_clean, peak_idx=peak_idx)
     
     # 3. Расчет БПФ
     freqs, spec_sig = compute_spectrum(t_sig, E_sig_win)
