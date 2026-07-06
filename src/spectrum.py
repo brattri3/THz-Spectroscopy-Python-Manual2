@@ -62,8 +62,10 @@ def compute_spectrum(t: np.ndarray, E: np.ndarray) -> tuple[np.ndarray, np.ndarr
     return freqs, amplitude_spectrum
 
 
-def calculate_transmission(t_sig: np.ndarray, E_sig: np.ndarray, 
-                           t_bg: np.ndarray, E_bg: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def calculate_transmission(
+        t_sig: np.ndarray, E_sig: np.ndarray,
+        t_bg: np.ndarray, E_bg: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Полный цикл обработки: от сырого ТГц-сигнала до спектра пропускания по мощности."""
     
     # 1. Удаление постоянного смещения поля
