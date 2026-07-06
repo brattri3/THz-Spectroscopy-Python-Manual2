@@ -33,14 +33,12 @@
 % ==================== TABLE SUPPORT ====================
 \RequirePackage{tabularx}
 \RequirePackage{longtable}
-\RequirePackage[table]{xcolor}
+\RequirePackage[table, dvipsnames]{xcolor}
 \definecolor{lightgray}{RGB}{240,240,240}
-
-% ==================== COLORS (with dvipsnames) ====================
-\RequirePackage[dvipsnames]{xcolor}   % добавляем dvipsnames для RoyalBlue и др.
 
 % ==================== GRAPHICS SUPPORT ====================
 \RequirePackage{graphicx}
+\RequirePackage{float}
 \RequirePackage{ifthen}
 
 % ==================== IMAGE SCALING ====================
@@ -55,8 +53,10 @@
 }
 
 % ==================== PARAGRAPH SETTINGS ====================
-\setlength{\parindent}{0cm}
-\setlength{\parskip}{1em}
+\RequirePackage{setspace}
+\onehalfspacing % Полуторный интервал по ГОСТ
+\setlength{\parindent}{1.25cm} % Абзацный отступ по ГОСТ
+\setlength{\parskip}{0pt} % Без дополнительных отступов между абзацами
 
 % ==================== PAGE LAYOUT ====================
 \RequirePackage{geometry}
@@ -73,26 +73,28 @@
 \RequirePackage{titlesec}
 \titleformat{\section}
 {\bfseries\Large}
-{\hspace{-1.5cm}\thesection.}
+{\thesection}
 {1em}
 {}
 
 \titleformat{\subsection}
 {\bfseries\large}
-{\hspace{-0.5cm}\thesubsection.}
+{\thesubsection}
 {1em}
 {}
 
 \titleformat{\subsubsection}
 {\bfseries}
-{\hspace{0cm}\thesubsubsection.}
+{\thesubsubsection}
 {1em}
 {}
 
 % ==================== LIST SETTINGS ====================
 \RequirePackage{enumitem}
+\setlist{nosep}
+\setlist[itemize]{labelindent=\parindent, leftmargin=*, itemsep=0pt, parsep=0pt, topsep=0pt, partopsep=0pt}
+\setlist[enumerate]{labelindent=\parindent, leftmargin=*, itemsep=0pt, parsep=0pt, topsep=0pt, partopsep=0pt}
 \RequirePackage{multicol}
-\setlist[description]{style=nextline, leftmargin=1.5cm, noitemsep, topsep=2pt}
 
 % ==================== CUSTOM TEXT COMMANDS ====================
 \RequirePackage[many]{tcolorbox}
@@ -130,11 +132,18 @@
 \tolerance=200
 
 % ==================== FIGURE REFERENCES ====================
-\newcommand{\figref}[1]{Рис.~\ref{#1}}
+\newcommand{\figref}[1]{Рисунок~\ref{#1}}
+
+% ==================== CAPTION SETTINGS ====================
+\RequirePackage{caption}
+\DeclareCaptionLabelSeparator{emdash}{~---~}
+\captionsetup{labelsep=emdash}
+\captionsetup[figure]{name=Рисунок, justification=centering}
+\captionsetup[table]{name=Таблица, justification=raggedright, singlelinecheck=false}
 
 % ==================== COUNTER SETTINGS ====================
-%\setcounter{figure}{0}
-%\setcounter{section}{4}
+\RequirePackage{chngcntr}
+\counterwithin{figure}{section}
 
 % ==================== HYPERREFERENCES ====================
 \RequirePackage[unicode=true, hidelinks]{hyperref}
@@ -183,17 +192,31 @@
 
 % ==================== MINTED SETTINGS ====================
 \RequirePackage{minted}
+\floatstyle{plaintop}
+\restylefloat{listing}
+\renewcommand{\listingscaption}{Листинг}
 \RequirePackage{caption}    % для подписей
-\captionsetup[listing]{hypcap=false}
+\captionsetup[listing]{hypcap=false, labelsep=emdash, justification=raggedright, singlelinecheck=false, skip=-10pt, position=top, labelfont=bf}
+
+\RequirePackage{etoolbox}
+
+
+
+\definecolor{mintedbg}{RGB}{245,247,250}
+\definecolor{mintedframe}{RGB}{200,205,210}
 
 \setminted{
+	bgcolor=mintedbg,
 	frame=single,
-	framesep=2mm,
+	rulecolor=\color{mintedframe},
+	framesep=2.5mm,
+	framerule=0.8pt,
 	baselinestretch=1.2,
 	fontsize=\footnotesize,
 	tabsize=4,
 	breaklines,
 	autogobble,
+	linenos=true,
 	style=friendly
 }
 
@@ -228,9 +251,21 @@
 \makeatother
 
 % ==================== NOTES / WARNINGS / TIPS ====================
-\long\def\note#1{{\color{RoyalBlue}\textbf{Примечание:} #1}}
-\long\def\warning#1{{\color{BurntOrange}\textbf{Важно:} #1}}
-\long\def\tip#1{{\color{ForestGreen}\textbf{Совет:} #1}}
+\long\def\note#1{%
+	\begin{tcolorbox}[colback=RoyalBlue!5!white, colframe=RoyalBlue!75!black, title=\textbf{Примечание}, arc=2mm]
+		#1
+	\end{tcolorbox}%
+}
+\long\def\warning#1{%
+	\begin{tcolorbox}[colback=BurntOrange!5!white, colframe=BurntOrange!75!black, title=\textbf{Важно}, arc=2mm]
+		#1
+	\end{tcolorbox}%
+}
+\long\def\tip#1{%
+	\begin{tcolorbox}[colback=ForestGreen!5!white, colframe=ForestGreen!75!black, title=\textbf{Совет}, arc=2mm]
+		#1
+	\end{tcolorbox}%
+}
 
 % ==================== PLACEHOLDERS & SMART FIGURES ====================
 \newcommand{\smartfigure}[3]{%
@@ -242,9 +277,7 @@
 			\fbox{\parbox{0.8\textwidth}{
 				\centering
 				\vspace{1.5cm}
-				\textbf{\textsf{Место для изображения: images/#1}} \\
-				\vspace{0.5cm}
-				\textit{#2}
+				\textbf{\textsf{Место для изображения: images/#1}}
 				\vspace{1.5cm}
 			}}
 		}
@@ -259,9 +292,7 @@
 		\fbox{\parbox{0.8\textwidth}{
 			\centering
 			\vspace{1.5cm}
-			\textbf{\textsf{Место для скриншота #1}} \\
-			\vspace{0.5cm}
-			\textit{#2}
+			\textbf{\textsf{Место для скриншота #1}}
 			\vspace{1.5cm}
 		}}
 		\caption{Скриншот #1}

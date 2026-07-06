@@ -40,6 +40,21 @@ You are a team of experts working on creating a methodological guide for process
 - Use macros from `myconfig.sty` (e.g., `\note{}`, `\warning{}`, `\tip{}`, `\smartfigure{}`). **CRITICAL: Never use empty lines (paragraph breaks) inside the arguments of `\note{}`, `\warning{}`, or `\tip{}`. Use `\\` for line breaks if necessary. Empty lines will cause fatal `Paragraph ended before \@textcolor was complete` errors during LaTeX compilation.**
 - **No code duplication in Appendix (Executable Python Files)**: All Python scripts listed in the appendices MUST be stored as real, executable `.py` files in the `src/` folder of the project (e.g., `src/config.py`, `src/utils.py`). The corresponding appendix `.tex` files MUST load these files dynamically using `\inputminted{python}{../src/<filename>.py}` instead of copy-pasting the full code blocks into the LaTeX document. This ensures that the code can be easily run/tested directly and eliminates synchronization errors.
 - ALWAYS consult and update `/text/figures_index.md` when adding new images to maintain `figX.Y.png` numbering.
-- Explain every significant line of code (Progressive Disclosure).
-- Ensure the LaTeX compiles seamlessly.
-- Refer to `manifest.md` for full pedagogical standards.
+- **Adaptive Pedagogy**: Do not strictly force the 'Tell, Show, Do, Review' pattern if it disrupts the natural flow of the text. Follow the established style in sections 1-3. Ensure a smooth, logical progression from theory to code without robotic transitions.
+- **GOST Formatting Standards**: Maintain GOST-compliant LaTeX formatting as set in `myconfig.sty` (e.g., 1.5 line spacing, paragraph indentation of 1.25cm). Use `Рисунок~\ref{...}` for figure references, and ensure all captions use em-dash (`~---~`).
+- **Student & Editor Checks**: 
+  - *Student Check*: Every section must contain code that a student can realistically execute. Ensure paths, imports, and setups are clearly explained.
+  - *Editor Check*: Ensure professional formatting, consistent terminology (with simple explanations for jargon), active voice, and typo-free text.
+
+## Environment Constraints
+- **CRITICAL: NO LATEX COMPILATION ALLOWED**: Do NOT attempt to compile LaTeX documents (using `xelatex`, `pdflatex`, etc.) or install LaTeX packages via `apt-get` or any other package manager within this environment. The environment is absolutely NOT meant for full document compilation, and package installations will freeze on interactive prompts, breaking the tool execution. We only work with text/code editing in this project. Provide LaTeX code edits and structural changes conceptually without ever trying to build or compile the PDF.
+- **CRITICAL: STRICT NATIVE TOOLS ONLY FOR FILE OPERATIONS**: You are strictly FORBIDDEN from using the `run_command` tool with shell utilities (like `grep`, `sed`, `awk`, `cat`, `ls`, `find`, or inline python scripts) for text replacement, file reading, or searching.
+  - You MUST use ONLY the native API tools provided by the environment:
+    1. `view_file` (to read lines from a file)
+    2. `edit_file` (to replace a contiguous block of text)
+    3. `multi_edit_file` (to replace multiple text blocks at once)
+    4. `create_file` (to create new files)
+    5. `delete_file` (to delete files)
+    6. `list_dir` (to view contents of directories)
+    7. `move` (to rename or move files/directories)
+  - DO NOT automate text processing with shell scripts. Use the native tools to open, read, and write to files.

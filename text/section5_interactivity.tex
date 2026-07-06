@@ -67,8 +67,8 @@ spectra_to_plot = {
 Для реализации этого механизма мы обновим модуль \texttt{data\_loader.py}, добавив функцию \texttt{load\_dataset\_to\_store}. Она автоматически обходит папку с данными, находит пары файлов по метаданным в именах и сохраняет их в базу данных. Полный код этой функции приведен в \textbf{\textit{Приложение~\ref{app:data_loader}}}.
 
 Давай подробно разберем логику работы этого загрузчика:
-\begin{minipage}{\linewidth}
-	\captionof{listing}{Реляционная загрузка данных в базу (data\_loader.py)}
+\begin{listing}[H]
+	\caption{Реляционная загрузка данных в базу (data\_loader.py)}
 	\begin{minted}{python}
 def load_dataset_to_store(data_dir) -> dict:
     data_store = {}
@@ -105,7 +105,9 @@ def load_dataset_to_store(data_dir) -> dict:
             
     return data_store
 	\end{minted}
-\end{minipage}
+\end{listing}
+
+
 
 \note{Программа сканирует папку в два прохода. На первом шаге она загружает все референсные (фоновые) сигналы в словарь \texttt{bg\_files}. На втором шаге она разбирает имена файлов сигналов образца, извлекает углы и номер повторения \texttt{rep}, а затем формирует в \texttt{data\_store} неразрывные пары сигналов и фонов с идентичными метаданными в ключах.}
 
@@ -115,8 +117,8 @@ def load_dataset_to_store(data_dir) -> dict:
 
 Добавим функцию \texttt{process\_dataset} в наш спектральный модуль \texttt{spectrum.py} (полный листинг модуля находится в \textbf{\textit{Приложение~\ref{app:spectrum}}}):
 
-\begin{minipage}{\linewidth}
-	\captionof{listing}{Пакетная обработка базы данных (spectrum.py)}
+\begin{listing}[H]
+	\caption{Пакетная обработка базы данных (spectrum.py)}
 	\begin{minted}{python}
 def process_dataset(data_store: dict) -> dict:
     # Находим все уникальные пары углов (angle1, angle2)
@@ -163,7 +165,9 @@ def process_dataset(data_store: dict) -> dict:
             
     return data_store
 	\end{minted}
-\end{minipage}
+\end{listing}
+
+
 
 \note{Благодаря NumPy векторным операциям усреднение семейства спектров выполняется мгновенно с помощью функции \texttt{np.mean(..., axis=0)}. Это позволяет обрабатывать огромные экспериментальные массивы за доли секунды.}
 
@@ -185,8 +189,8 @@ def process_dataset(data_store: dict) -> dict:
 
 Рассмотрим ключевые моменты инициализации сетки графиков и функции обновления данных:
 
-\begin{minipage}{\linewidth}
-	\captionof{listing}{Логика обновления сетки графиков (interactive\_plots.py)}
+\begin{listing}[H]
+	\caption{Логика обновления сетки графиков (interactive\_plots.py)}
 	\begin{minted}{python}
 # Создаем сетку из двух графиков (2 строки, 1 колонка)
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11, 8))
@@ -235,7 +239,9 @@ def update_plot(label):
     # Запрашиваем перерисовку холста (холст обновится плавно)
     fig.canvas.draw_idle()
 	\end{minted}
-\end{minipage}
+\end{listing}
+
+
 
 \note{Методы \texttt{ax.relim()} и \texttt{ax.autoscale\_view()} заставляют Matplotlib автоматически пересчитать новые границы графиков под изменившийся сигнал, но делают это выборочно — мы отключили автомасштабирование по оси X (\texttt{scalex=False}), чтобы временная шкала и диапазон частот оставались стабильными, а масштабировалась только амплитуда.}
 
@@ -249,8 +255,8 @@ def update_plot(label):
 
 Напишем вспомогательную функцию \texttt{plot\_all\_transmissions()}, которая извлекает из СУБД все усредненные спектры и строит их, используя плавную цветовую карту градиента:
 
-\begin{minipage}{\linewidth}
-	\captionof{listing}{Построение семейства кривых пропускания (interactive\_plots.py)}
+\begin{listing}[H]
+	\caption{Построение семейства кривых пропускания (interactive\_plots.py)}
 	\begin{minted}{python}
 def plot_all_transmissions():
     data_store = data_loader.load_dataset_to_store(config.DATA_DIR)
@@ -278,7 +284,9 @@ def plot_all_transmissions():
     plt.tight_layout()
     plt.show()
 	\end{minted}
-\end{minipage}
+\end{listing}
+
+
 
 Использование конструкции \texttt{plt.cm.plasma(np.linspace(...))} позволяет автоматически распределить цвета линий по спектральной карте. Это делает графики эстетичными и легко читаемыми. Итоговый график семейства кривых пропускания показан на \figref{fig:5_2}.
 

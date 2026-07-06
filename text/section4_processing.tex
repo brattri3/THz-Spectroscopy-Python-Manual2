@@ -18,7 +18,7 @@
 \subsection{Формат данных и типы в NumPy: Знакомимся с np.ndarray}
 
 Прежде чем приступать к цифровой обработке, давай вспомним, в каком именно формате возвращает данные наша функция \texttt{load\_tds\_data}, написанная в предыдущем разделе. При вызове:
-\begin{minted}{python}
+\begin{minted}[linenos=false]{python}
 t, E = load_tds_data(filepath)
 \end{minted}
 мы получаем два связанных одномерных числовых вектора:
@@ -44,8 +44,8 @@ t, E = load_tds_data(filepath)
 
 Рецепт исправления предельно прост: нужно вычислить среднее значение сигнала и вычесть его из каждой точки:
 
-\begin{minipage}{\linewidth}
-	\captionof{listing}{Удаление постоянной составляющей (spectrum.py)}
+\begin{listing}[H]
+	\caption{Удаление постоянной составляющей (spectrum.py)}
 	\begin{minted}{python}
 import numpy as np
 
@@ -53,7 +53,9 @@ def remove_dc(E: np.ndarray) -> np.ndarray:
     """Вычитает среднее арифметическое значение из массива амплитуд поля."""
     return E - np.mean(E)
 	\end{minted}
-\end{minipage}
+\end{listing}
+
+
 
 Обрати внимание на синтаксис определения функции \texttt{remove\_dc(E: np.ndarray) -> np.ndarray}. Здесь впервые в нашей книге используются \textbf{аннотации типов} (type hinting / тайп-хинтинг — подсказки типов), ставшие стандартом в современном Python:
 \begin{itemize}
@@ -76,8 +78,8 @@ W(t) = \exp\left( -\frac{(t - t_{\text{peak}})^2}{2\sigma^2} \right)
 
 Перед генерацией окна необходимо автоматически найти положение главного пика импульса $t_{\text{peak}}$, чтобы точно отцентрировать окно по временной шкале:
 
-\begin{minipage}{\linewidth}
-	\captionof{listing}{Центрирование и наложение Гауссова окна (spectrum.py)}
+\begin{listing}[H]
+	\caption{Центрирование и наложение Гауссова окна (spectrum.py)}
 	\begin{minted}{python}
 import config
 
@@ -104,7 +106,9 @@ def apply_gaussian_window(t: np.ndarray, E: np.ndarray, sigma_ps: float = None, 
     E_windowed = E * window
     return E_windowed, window
 	\end{minted}
-\end{minipage}
+\end{listing}
+
+
 
 Давай внимательно разберем заголовок и структуру функции \texttt{apply\_gaussian\_window}. Здесь мы видим несколько новых для нас конструкций современного Python:
 \begin{enumerate}
@@ -149,8 +153,8 @@ def apply_gaussian_window(t: np.ndarray, E: np.ndarray, sigma_ps: float = None, 
 
 Частотную шкалу мы получим с помощью функции \texttt{rfftfreq}:
 
-\begin{minipage}{\linewidth}
-	\captionof{listing}{Вычисление спектра амплитуд (spectrum.py)}
+\begin{listing}[H]
+	\caption{Вычисление спектра амплитуд (spectrum.py)}
 	\begin{minted}{python}
 from scipy.fft import rfft, rfftfreq
 
@@ -174,7 +178,9 @@ def compute_spectrum(t: np.ndarray, E: np.ndarray) -> tuple[np.ndarray, np.ndarr
     
     return freqs, amplitude_spectrum
 	\end{minted}
-\end{minipage}
+\end{listing}
+
+
 
 \subsection{Шаг 4: Усреднение сигналов в спектральной области}
 
@@ -195,8 +201,8 @@ T(\nu) = \left| \frac{E_{\text{sample}}(\nu)}{E_{\text{bg}}(\nu)} \right|^2 = \l
 
 Напишем функцию \texttt{calculate\_transmission}, которая объединяет все шаги в единый конвейер:
 
-\begin{minipage}{\linewidth}
-	\captionof{listing}{Конвейер расчета спектра пропускания (spectrum.py)}
+\begin{listing}[H]
+	\caption{Конвейер расчета спектра пропускания (spectrum.py)}
 	\begin{minted}{python}
 def calculate_transmission(t_sig: np.ndarray, E_sig: np.ndarray, 
                            t_bg: np.ndarray, E_bg: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -224,7 +230,9 @@ def calculate_transmission(t_sig: np.ndarray, E_sig: np.ndarray,
     
     return freqs, spec_sig, spec_bg, transmission
 	\end{minted}
-\end{minipage}
+\end{listing}
+
+
 
 \begin{minitaskbox}
 	\textbf{Мини-задание: Численный эксперимент с шириной Гауссова окна} \\
