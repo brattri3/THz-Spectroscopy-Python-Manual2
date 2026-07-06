@@ -153,48 +153,36 @@ if __name__ == '__main__':
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     
-    print("Запуск автономного тестирования модуля spectrum.py...")
+    print("Запуск автономного тестирования модуля spectrum.py на реальных данных...")
     
-    # 1. Генерируем синтетическую сетку времени (от 0 до 50 пс с шагом 0.05 пс)
-    t = np.linspace(0, 50, 1000)
+    import config
+    from data_loader import load_tds_data
+    from pathlib import Path
     
-    # 2. Генерируем реалистичный ТГц импульс (затухающая синусоида + шум + DC смещение)
-    t0 = 15.0  # Положение центра импульса
-    w = 2.0    # Ширина импульса
-    f0 = 1.2   # Центральная частота импульса (ТГц)
+    # 1. Загружаем реальные экспериментальные данные
+    t_sig, E_sig = load_tds_data(config.DATA_DIR / "50-0-1-bg_4.txt")
+    t_bg, E_bg = load_tds_data(config.DATA_DIR / "bg_4.txt")
     
-    # Сигнал фона (чистый воздух)
-    E_bg_raw = np.exp(-0.5 * ((t - t0) / w) ** 2) * np.cos(2 * np.pi * f0 * (t - t0)) + 0.15
-    # Сигнал образца (ослабленный и слегка зашумленный)
-    E_sig_raw = 0.6 * np.exp(-0.5 * ((t - t0) / w) ** 2) * np.cos(2 * np.pi * f0 * (t - t0)) + 0.15
-    
-    # Добавим белый гауссов шум ко обоим сигналам
-    np.random.seed(42)  # Фиксируем seed для воспроизводимости
-    noise_bg = np.random.normal(0, 0.015, len(t))
-    noise_sig = np.random.normal(0, 0.015, len(t))
-    E_bg = E_bg_raw + noise_bg
-    E_sig = E_sig_raw + noise_sig
-    
-    # 3. Тестируем удаление постоянного смещения и применение окна
+    # 2. Тестируем удаление постоянного смещения и применение окна
     E_sig_dc = remove_dc(E_sig)
-    E_sig_win, win = apply_gaussian_window(t, E_sig_dc)
+    E_sig_win, win = apply_gaussian_window(t_sig, E_sig_dc)
     
     print("  - Среднее значение до удаления DC:", np.mean(E_sig))
     print("  - Среднее значение после удаления DC:", np.mean(E_sig_dc))
-    print("  - Координата найденного центра пика:", t[find_peak_center(E_sig_dc)], "пс")
+    print("  - Координата найденного центра пика:", t_sig[find_peak_center(E_sig_dc)], "пс")
     
-    # 4. Вычисляем сквозной конвейер пропускания
-    freqs, spec_sig, spec_bg, transmission = calculate_transmission(t, E_sig, t, E_bg)
+    # 3. Вычисляем сквозной конвейер пропускания
+    freqs, spec_sig, spec_bg, transmission = calculate_transmission(t_sig, E_sig, t_bg, E_bg)
     
-    # 5. Строим двухпанельный проверочный график для сигналов
+    # 4. Строим двухпанельный проверочный график для сигналов
     plt.figure(figsize=(10, 8))
     
     # Панель 1: Временной сигнал и Гауссово окно
     plt.subplot(2, 1, 1)
-    plt.plot(t, E_sig, 'gray', alpha=0.5, label='Сырой сигнал образца')
-    plt.plot(t, E_sig_dc, 'royalblue', label='Сигнал после удаления DC')
-    plt.plot(t, win * np.max(E_sig_dc), 'crimson', linestyle='--', label='Гауссово окно (масштаб)')
-    plt.plot(t, E_sig_win, 'darkblue', linewidth=1.5, label='Заокненный сигнал')
+    plt.plot(t_sig, E_sig, 'gray', alpha=0.5, label='Сырой сигнал образца')
+    plt.plot(t_sig, E_sig_dc, 'royalblue', label='Сигнал после удаления DC')
+    plt.plot(t_sig, win * np.max(E_sig_dc), 'crimson', linestyle='--', label='Гауссово окно (масштаб)')
+    plt.plot(t_sig, E_sig_win, 'darkblue', linewidth=1.5, label='Заокненный сигнал')
     plt.title("Временная область: Наложение окна")
     plt.xlabel("Время (пс)")
     plt.ylabel("Амплитуда поля E (у.е.)")

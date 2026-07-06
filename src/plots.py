@@ -37,61 +37,13 @@ def plot_time_signals(t_bg, E_bg, t_sig, E_sig):
     plt.show()
 
 
-def generate_synthetic_dataset(data_dir):
-    """
-    Генерирует синтетический набор данных ТГц спектроскопии для тестирования,
-    если директория пуста или отсутствует.
-    """
-    path = Path(data_dir)
-    path.mkdir(parents=True, exist_ok=True)
-    
-    # Если в папке уже есть txt файлы, ничего не делаем
-    if list(path.glob("*.txt")):
-        return
-        
-    print(f"Директория {data_dir} пуста. Генерируем синтетический набор данных...")
-    
-    t = np.linspace(0, 50, 500)
-    t0 = 15.0
-    w = 2.0
-    f0 = 1.2
-    
-    # Генерируем 3 файла фона (bg_1.txt, bg_2.txt, bg_3.txt)
-    np.random.seed(42)
-    for rep in [1, 2, 3]:
-        # Опорный сигнал (воздух)
-        E_bg = np.exp(-0.5 * ((t - t0) / w) ** 2) * np.cos(2 * np.pi * f0 * (t - t0))
-        # Добавляем DC смещение и небольшой шум, зависящий от номера повторения (дрейф!)
-        E_bg += 0.15 + np.random.normal(0, 0.01 + 0.005 * rep, len(t))
-        
-        filepath = path / f"bg_{rep}.txt"
-        np.savetxt(filepath, np.column_stack((t, E_bg)))
-        
-    # Генерируем файлы сигналов образца для разных углов
-    # Согласно закону Малюса для амплитуды ТГц поля: E_sample = E_bg * cos(angle)
-    # Плюс учтем дрейф прибора
-    angles = [0.0, 15.0, 30.0, 45.0, 60.0, 75.0, 90.0]
-    for angle in angles:
-        for rep in [1, 2, 3]:
-            # Сигнал образца
-            rad = np.radians(angle)
-            factor = np.cos(rad)  # Физическое ослабление
-            
-            E_sig = factor * np.exp(-0.5 * ((t - t0) / w) ** 2) * np.cos(2 * np.pi * f0 * (t - t0))
-            # Добавим DC и дрейфующий шум
-            E_sig += 0.15 + np.random.normal(0, 0.01 + 0.005 * rep, len(t))
-            
-            # Формат имени: angle1-angle2-repetition-bg_name.txt
-            filename = f"{angle:.1f}-0.0-{rep}-bg_{rep}.txt"
-            filepath = path / filename
-            np.savetxt(filepath, np.column_stack((t, E_sig)))
-            
-    print("Синтетический набор данных успешно создан.")
-
-
 def main_interactive():
-    # Гарантируем наличие данных
-    generate_synthetic_dataset(config.DATA_DIR)
+    # Проверяем наличие файлов в директории данных
+    path = Path(config.DATA_DIR)
+    if not path.exists() or not list(path.glob("*.txt")):
+        print(f"Ошибка: Директория данных '{config.DATA_DIR}' пуста или не существует!")
+        print("Пожалуйста, распакуйте архив с экспериментальными данными.")
+        return
     
     # 1. Загружаем экспериментальный датасет в СУБД-хранилище
     data_store = data_loader.load_dataset_to_store(config.DATA_DIR)
@@ -253,10 +205,12 @@ if __name__ == '__main__':
     matplotlib.use('Agg')
     
     print("Запуск тестирования interactive_plots.py...")
-    # Проверим, что всё отрабатывает без графического окна (режим Agg)
-    generate_synthetic_dataset(config.DATA_DIR)
-    data_store = data_loader.load_dataset_to_store(config.DATA_DIR)
-    data_store = spectrum.process_dataset(data_store)
-    print("  - Загружено ключей в базу:", len(data_store))
-    print("  - Спектральные ключи:", sorted([k for k in data_store.keys() if k[0] == 'spec_avg']))
+    path = Path(config.DATA_DIR)
+    if not path.exists() or not list(path.glob("*.txt")):
+        print("Ошибка: Тестовые данные отсутствуют. Пропуск тестирования.")
+    else:
+        data_store = data_loader.load_dataset_to_store(config.DATA_DIR)
+        data_store = spectrum.process_dataset(data_store)
+        print("  - Загружено ключей в базу:", len(data_store))
+        print("  - Спектральные ключи:", sorted([k for k in data_store.keys() if k[0] == 'spec_avg']))
     print("Тестирование завершено успешно.")
