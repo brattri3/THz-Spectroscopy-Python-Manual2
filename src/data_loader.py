@@ -22,8 +22,9 @@ def parse_filename(filename: str):
     repetition = int(parts[2])
     bg_name = parts[3]
     
-    # Нормализуем угол первого ротатора с помощью готовой утилиты из Раздела 2
+    # Нормализуем углы поляризаторов с помощью готовой утилиты
     angle1 = normalize_angle(angle1)
+    angle2 = normalize_angle(angle2)
         
     return angle1, angle2, repetition, bg_name
 
