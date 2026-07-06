@@ -94,6 +94,18 @@
 \setlist{nosep}
 \setlist[itemize]{labelindent=\parindent, leftmargin=*, itemsep=0pt, parsep=0pt, topsep=0pt, partopsep=0pt}
 \setlist[enumerate]{labelindent=\parindent, leftmargin=*, itemsep=0pt, parsep=0pt, topsep=0pt, partopsep=0pt}
+
+% Специальный список для разбора синтаксиса и кода
+\newlist{syntaxdesc}{description}{1}
+\setlist[syntaxdesc]{%
+	labelindent=\parindent,
+	leftmargin=*,
+	font=\normalfont\bfseries,
+	itemsep=0.4em,
+	parsep=0pt,
+	topsep=0.4em,
+	partopsep=0pt
+}
 \RequirePackage{multicol}
 
 % ==================== CUSTOM TEXT COMMANDS ====================
@@ -206,18 +218,52 @@
 \definecolor{mintedframe}{RGB}{200,205,210}
 
 \setminted{
-	bgcolor=mintedbg,
-	frame=single,
-	rulecolor=\color{mintedframe},
-	framesep=2.5mm,
-	framerule=0.8pt,
 	baselinestretch=1.2,
 	fontsize=\footnotesize,
 	tabsize=4,
 	breaklines,
 	autogobble,
 	linenos=true,
-	style=friendly
+	style=friendly,
+	numbersep=6pt
+}
+
+% Автоматическое оборачивание всех блоков minted в tcolorbox для сплошной заливки фона
+\BeforeBeginEnvironment{minted}{%
+	\begin{tcolorbox}[
+		enhanced,
+		breakable,
+		colback=mintedbg,
+		colframe=mintedframe,
+		boxrule=0.8pt,
+		arc=2pt,
+		left=6mm,
+		right=2mm,
+		top=1.5mm,
+		bottom=1.5mm,
+		boxsep=0mm
+	]%
+}
+\AfterEndEnvironment{minted}{\end{tcolorbox}}
+
+% Автоматическое оборачивание \inputminted в tcolorbox для единообразия
+\let\oldinputminted\inputminted
+\renewcommand{\inputminted}[3][]{%
+	\begin{tcolorbox}[
+		enhanced,
+		breakable,
+		colback=mintedbg,
+		colframe=mintedframe,
+		boxrule=0.8pt,
+		arc=2pt,
+		left=6mm,
+		right=2mm,
+		top=1.5mm,
+		bottom=1.5mm,
+		boxsep=0mm
+	]%
+	\oldinputminted[#1]{#2}{#3}%
+	\end{tcolorbox}%
 }
 
 % Корректировка цвета комментариев для лучшей контрастности на белом фоне листа.
