@@ -71,23 +71,29 @@
 
 % ==================== HEADING FORMATTING ====================
 \RequirePackage{titlesec}
+\definecolor{headerblue}{RGB}{12, 35, 64}
+
 \titleformat{\section}
-{\bfseries\Large}
+{\bfseries\Large\color{headerblue}}
 {\thesection}
 {1em}
 {}
 
 \titleformat{\subsection}
-{\bfseries\large}
+{\bfseries\large\color{headerblue}}
 {\thesubsection}
 {1em}
 {}
 
 \titleformat{\subsubsection}
-{\bfseries}
+{\bfseries\color{headerblue}}
 {\thesubsubsection}
 {1em}
 {}
+
+\titlespacing*{\section}{0pt}{18pt plus 4pt minus 2pt}{8pt plus 2pt}
+\titlespacing*{\subsection}{0pt}{14pt plus 3pt minus 2pt}{6pt plus 1pt}
+\titlespacing*{\subsubsection}{0pt}{10pt plus 2pt minus 2pt}{4pt plus 1pt}
 
 % ==================== LIST SETTINGS ====================
 \RequirePackage{enumitem}
@@ -95,16 +101,15 @@
 \setlist[itemize]{labelindent=\parindent, leftmargin=*, itemsep=0pt, parsep=0pt, topsep=0pt, partopsep=0pt}
 \setlist[enumerate]{labelindent=\parindent, leftmargin=*, itemsep=0pt, parsep=0pt, topsep=0pt, partopsep=0pt}
 
-% Специальный список для разбора синтаксиса и кода
-\newlist{syntaxdesc}{description}{1}
-\setlist[syntaxdesc]{%
-	labelindent=\parindent,
-	leftmargin=*,
-	font=\normalfont\bfseries,
-	itemsep=0.4em,
-	parsep=0pt,
-	topsep=0.4em,
-	partopsep=0pt
+% Специальное окружение для разбора синтаксиса (абзацы без правого отступа, выделенные жирным шрифтом)
+\newenvironment{syntaxdesc}{%
+	\par\vspace{0.3em}%
+	\newcommand{\syntaxitem}[1][]{%
+		\par\vspace{0.4em}\noindent\textbf{##1} ~--- %
+	}%
+	\let\item\syntaxitem
+}{%
+	\par\vspace{0.5em}%
 }
 \RequirePackage{multicol}
 
@@ -232,7 +237,6 @@
 \BeforeBeginEnvironment{minted}{%
 	\begin{tcolorbox}[
 		enhanced,
-		breakable,
 		colback=mintedbg,
 		colframe=mintedframe,
 		boxrule=0.8pt,
