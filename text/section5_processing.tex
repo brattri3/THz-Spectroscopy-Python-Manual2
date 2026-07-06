@@ -253,9 +253,9 @@ def calculate_transmission(
 
 Добавим функцию \mycode{process\_dataset} в спектральный модуль \mycode{spectrum.py} (полный листинг модуля находится в \textbf{\textit{Приложении~\ref{app:spectrum}}}):
 
-\begin{listing}[H]
-	\caption{Пакетная обработка базы данных (\mycode{spectrum.py})}\label{lst:process_dataset}
-	\begin{minted}{python}
+\refstepcounter{listing}\label{lst:process_dataset}
+\noindent\textbf{Листинг~\thelisting~---~Пакетная обработка базы данных (\mycode{spectrum.py})}
+\begin{minted}{python}
 def process_dataset(data_store: dict) -> dict:
     # Находим все уникальные пары углов (angle1, angle2)
     angle_pairs = set()
@@ -308,8 +308,7 @@ def process_dataset(data_store: dict) -> dict:
             )
 
     return data_store
-	\end{minted}
-\end{listing}
+\end{minted}
 
 \subsubsection{Разбор кода: Пакетный обработчик}
 
