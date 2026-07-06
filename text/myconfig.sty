@@ -101,11 +101,14 @@
 \setlist[itemize]{labelindent=\parindent, leftmargin=*, itemsep=0pt, parsep=0pt, topsep=0pt, partopsep=0pt}
 \setlist[enumerate]{labelindent=\parindent, leftmargin=*, itemsep=0pt, parsep=0pt, topsep=0pt, partopsep=0pt}
 
-% Специальное окружение для разбора синтаксиса (абзацы без правого отступа, выделенные жирным шрифтом)
+% Специальное окружение для разбора синтаксиса (абзацы с обратным/выступающим отступом - hanging indent)
 \newenvironment{syntaxdesc}{%
 	\par\vspace{0.3em}%
 	\newcommand{\syntaxitem}[1][]{%
-		\par\vspace{0.4em}\noindent\textbf{##1} ~--- %
+		\par\vspace{0.4em}%
+		\hangindent=1.25cm%
+		\hangafter=1%
+		\noindent\textbf{##1} ~--- %
 	}%
 	\let\item\syntaxitem
 }{%
