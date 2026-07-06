@@ -40,6 +40,19 @@ You are a team of experts working on creating a methodological guide for process
 - **Formatting of Appendix References (CRITICAL)**:
   - Every reference/link to an Appendix (e.g., `Приложение~\ref{app:config}`, `Приложении~\ref{app:data_loader}`) MUST be formatted in bold italic using `\textbf{\textit{...}}` (e.g., `\textbf{\textit{Приложение~\ref{app:config}}}`). Do not use normal bold or normal text for appendix references.
 - Use macros from `myconfig.sty` (e.g., `\note{}`, `\warning{}`, `\tip{}`, `\smartfigure{}`). **CRITICAL: Never use empty lines (paragraph breaks) inside the arguments of `\note{}`, `\warning{}`, or `\tip{}`. Use `\\` for line breaks if necessary. Empty lines will cause fatal `Paragraph ended before \@textcolor was complete` errors during LaTeX compilation.**
+- **Uniform Code Breakdown Standard (CRITICAL)**:
+  - Every detailed code explanation or syntax breakdown following a listing MUST be wrapped in a dedicated, named level-3 subsection: `\subsubsection{Разбор кода}` (or `\subsubsection{Разбор кода: Тема/Имя файла}`).
+  - To explain code elements, variables, commands, or math operators, you MUST strictly use the custom list environment **`\begin{syntaxdesc} ... \end{syntaxdesc}`** (defined in `myconfig.sty`). Do NOT use standard `itemize`, `enumerate`, or manual bold lists.
+  - **Label Formatting Rule**: For pedagogical consistency, every list item in `syntaxdesc` MUST use a combined label containing BOTH the structural/logical role of the element and the exact, concrete code snippet from the listing:
+    `\item[Роль элемента \mycode{код_из_листинга}] Пояснение...`
+    Never use purely abstract roles (like `\item[Имя функции]`) or purely code elements (like `\item[\mycode{__file__}]`) alone. Always pair them to create clear, contextual connections for the student.
+  - Structure each item with this standardized pattern:
+    ```latex
+    \begin{syntaxdesc}
+        \item[Импорт библиотеки \mycode{from pathlib import Path}] Модуль \mycode{pathlib} --- это ...
+        \item[Имя функции \mycode{normalize_angle}] Записывается строчными буквами ...
+    \end{syntaxdesc}
+    ```
 - **No code duplication in Appendix (Executable Python Files)**: All Python scripts listed in the appendices MUST be stored as real, executable `.py` files in the `src/` folder of the project (e.g., `src/config.py`, `src/utils.py`). The corresponding appendix `.tex` files MUST load these files dynamically using `\inputminted{python}{../src/<filename>.py}` instead of copy-pasting the full code blocks into the LaTeX document. This ensures that the code can be easily run/tested directly and eliminates synchronization errors.
 - **Incremental Config.py Filling (CRITICAL)**:
   - The configuration module `config.py` in Section 2 (Listing 5) MUST remain minimal and only contain settings introduced up to that point (i.e. directories and paths).
