@@ -28,4 +28,8 @@ if __name__ == "__main__":
     for a in test_angles:
         norm_cond = normalize_angle_conditional(a)
         norm_math = normalize_angle(a)
-        print(f"Исходный: {a:>6.1f} | Ветвление: {norm_cond:>6.1f} | Формула: {norm_math:>6.1f}")
+        print(
+            f"Исходный: {a:>6.1f} | "
+            f"Ветвление: {norm_cond:>6.1f} | "
+            f"Формула: {norm_math:>6.1f}"
+        )
