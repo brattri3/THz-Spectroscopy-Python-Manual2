@@ -32,9 +32,11 @@ You are a team of experts working on creating a methodological guide for process
 
 ## Workflow Constraints
 - ALL code listings MUST use `minted`.
-- **Escaping LaTeX Special Characters (CRITICAL)**:
-  - Always escape special characters such as `_` (underscore), `%` (percent), `&` (ampersand), `#` (hash), `$` (dollar sign), `{`, and `}` in plain text, section titles (`\section`, `\subsection`), table of contents, captions, and labels.
-  - Underscores (`_`) inside file names, variable names, or any normal text MUST be escaped as `\_` (for example, write `data\_loader.py`, or inside typewriter font as `\texttt{data\_loader.py}`). Unescaped underscores will be interpreted as subscript triggers in math mode, causing fatal compilation errors (e.g., `Missing $ inserted` in `main.toc` or during compilation).
+- **Escaping LaTeX Special Characters & Using \mycode (CRITICAL)**:
+  - Always escape special characters such as `%` (percent), `&` (ampersand), `#` (hash), `$` (dollar sign), `{`, and `}` in plain text, section titles (`\section`, `\subsection`), table of contents, captions, and labels.
+  - **Do NOT use raw `\texttt{...}` or manual underscore escaping `\_` for file names, directories, variables, or short inline code snippets.** Instead, strictly use the custom centralized macro **`\mycode{...}`** defined in `myconfig.sty`.
+  - **No manual escaping required inside `\mycode`**: Because `\mycode` utilizes `\detokenize` internally, you can write symbols like underscores directly. For example, write `\mycode{data_loader.py}`, `\mycode{config.py}`, `\mycode{normalize_angle}`, `\mycode{utils.py}`, or `\mycode{C:\THz_Project}` exactly as they are, without any escaping.
+  - Underscores (`_`) inside normal text outside of `\mycode` MUST be escaped as `\_` if they are not part of any code or path. Unescaped underscores outside of `\mycode` or math mode will cause fatal `Missing $ inserted` compilation errors.
 - **Formatting of Appendix References (CRITICAL)**:
   - Every reference/link to an Appendix (e.g., `Приложение~\ref{app:config}`, `Приложении~\ref{app:data_loader}`) MUST be formatted in bold italic using `\textbf{\textit{...}}` (e.g., `\textbf{\textit{Приложение~\ref{app:config}}}`). Do not use normal bold or normal text for appendix references.
 - Use macros from `myconfig.sty` (e.g., `\note{}`, `\warning{}`, `\tip{}`, `\smartfigure{}`). **CRITICAL: Never use empty lines (paragraph breaks) inside the arguments of `\note{}`, `\warning{}`, or `\tip{}`. Use `\\` for line breaks if necessary. Empty lines will cause fatal `Paragraph ended before \@textcolor was complete` errors during LaTeX compilation.**
