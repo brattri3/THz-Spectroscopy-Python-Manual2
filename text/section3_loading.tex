@@ -178,8 +178,19 @@ t_bg, E_bg = load_tds_data(config.DATA_DIR / "bg_4.txt")
 
 plt.figure(figsize=(9, 4.5))
 # Строим две кривые на одной координатной сетке
-plt.plot(t_bg, E_bg, color='crimson', linestyle='--', label='Опорный сигнал (Фон)', alpha=0.8)
-plt.plot(t_sig, E_sig, color='navy', label='Сигнал образца', alpha=0.9)
+plt.plot(
+    t_bg, E_bg, 
+    color='crimson', 
+    linestyle='--', 
+    label='Опорный сигнал (Фон)', 
+    alpha=0.8
+)
+plt.plot(
+    t_sig, E_sig, 
+    color='navy', 
+    label='Сигнал образца', 
+    alpha=0.9
+)
 
 plt.xlabel('Время задержки (пс)')
 plt.ylabel('Амплитуда поля E (у.е.)')
