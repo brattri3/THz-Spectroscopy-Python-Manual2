@@ -124,7 +124,9 @@ def load_dataset_to_store(data_dir) -> dict:
 \begin{listing}[H]
 	\caption{Функция извлечения пары сигналов из базы данных (\mycode{utils.py})}\label{lst:get_signal_pair}
 	\begin{minted}{python}
-def get_signal_pair(db: dict, angle1: float, angle2: float, rep: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def get_signal_pair(
+    db: dict, angle1: float, angle2: float, rep: int
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Извлекает из базы данных db пару сигналов (образца и фона) по углам и реплике.
     Возвращает кортеж (t_bg, E_bg, t_sig, E_sig).
@@ -146,9 +148,9 @@ def get_signal_pair(db: dict, angle1: float, angle2: float, rep: int) -> tuple[n
 
 \subsubsection[Разбор кода: Функция-запрос get\_signal\_pair]{Разбор кода: Функция-запрос \mycode{get_signal_pair}}
 \begin{syntaxdesc}
-    \item[Составные ключи \mycode{sig_key} и \mycode{bg_key} (строки 6--7)] Динамически формируют кортежи-ключи для поиска в базе данных по переданным параметрам углов и номеру реплики.
-    \item[Защитная проверка \mycode{if sig_key not in db} (строки 9--12)] Проверяет наличие ключей в базе данных и выбрасывает понятное исключение \mycode{KeyError}, если файлы по ошибке были удалены или не загрузились.
-    \item[Извлечение и возврат данных \mycode{return t_bg, E_bg, t_sig, E_sig} (строки 14--17)] Считывает кортежи временной сетки и амплитуды и возвращает единый плоский кортеж из четырех массивов для передачи в модуль визуализации.
+    \item[Составные ключи \mycode{sig_key} и \mycode{bg_key} (строки 8--9)] Динамически формируют кортежи-ключи для поиска в базе данных по переданным параметрам углов и номеру реплики.
+    \item[Защитная проверка \mycode{if sig_key not in db} (строки 11--14)] Проверяет наличие ключей в базе данных и выбрасывает понятное исключение \mycode{KeyError}, если файлы по ошибке были удалены или не загрузились.
+    \item[Извлечение и возврат данных \mycode{return t_bg, E_bg, t_sig, E_sig} (строки 16--19)] Считывает кортежи временной сетки и амплитуды и возвращает единый плоский кортеж из четырех массивов для передачи в модуль визуализации.
 \end{syntaxdesc}
 
 Теперь обновим главный управляющий файл (скрипт-оркестратор) \mycode{main.py}. Вместо сырой ручной загрузки файлов из Раздела~\ref{sec:loading} мы проинициализируем базу данных, сделаем SQL-подобный запрос для той же пары углов ($50^\circ$ и $0^\circ$, реплика $1$) и передадим извлеченные векторы в готовую функцию визуализации:

@@ -23,7 +23,9 @@ def normalize_angle(angle: float) -> float:
     return ((angle + 180.0) % 360.0) - 180.0
 
 
-def get_signal_pair(db: dict, angle1: float, angle2: float, rep: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def get_signal_pair(
+    db: dict, angle1: float, angle2: float, rep: int
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Извлекает из базы данных (db) пару сигналов: сигнал образца и сигнал фона,
     соответствующие заданным углам поляризаторов и номеру реплики.
