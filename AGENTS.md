@@ -65,4 +65,13 @@ You are a team of experts working on creating a methodological guide for process
   - *Student Check*: Every section must contain code that a student can realistically execute. Ensure paths, imports, and setups are clearly explained.
   - *Editor Check*: Ensure professional formatting, consistent terminology (with simple explanations for jargon), active voice, and typo-free text.
 
+## PDF Compilation & Desktop Sync Rule
+- **No Manual PDF Copying**: Do NOT copy the compiled `main.pdf` from the sandbox to the user's Desktop workspace.
+- **Shortcut-Based Access**: The repository contains a Windows shortcut `text/main.lnk` pointing directly to the sandbox absolute path `C:\Users\pop\.gemini\antigravity\worktrees\THz-Spectroscopy-Python-Manual2\apply-latest-updates\text\main.pdf`. Every compilation in the sandbox automatically updates what the user sees when they open their local shortcut.
+- **Git Synchronization**:
+  - Always perform editing and compilation in the sandbox workspace.
+  - When changes are done, commit and push them to the **`main`** branch on GitHub.
+  - Then, run a `git pull origin main` command inside the user's desktop workspace `H:\Рабочий стол\Latex проекты\THz-Spectroscopy-Python-Manual2` to keep it synchronized.
+  - Inform the user of the successful compilation, and tell them they can view the updated PDF using their local shortcut.
+
 
