@@ -153,7 +153,7 @@ if __name__ == '__main__':
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     
-    print("Запуск автономного тестирования модуля spectrum.py на реальных данных...")
+    print("Запуск встроенного блока самотестирования модуля spectrum.py на реальных данных...")
     
     import config
     from data_loader import load_tds_data
