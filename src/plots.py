@@ -6,6 +6,37 @@ import config
 import data_loader
 import spectrum
 
+def plot_time_signals(t_bg, E_bg, t_sig, E_sig):
+    """
+    Строит графики опорного сигнала (фона) и сигнала образца во временной области.
+    """
+    plt.figure(figsize=(9, 4.5))
+    
+    # Опорный сигнал (Фон)
+    plt.plot(
+        t_bg, E_bg, 
+        color='crimson', 
+        linestyle='--', 
+        label='Опорный сигнал (Фон)', 
+        alpha=0.8
+    )
+    
+    # Сигнал образца
+    plt.plot(
+        t_sig, E_sig, 
+        color='navy', 
+        label='Сигнал образца', 
+        alpha=0.9
+    )
+    
+    plt.xlabel('Время задержки (пс)')
+    plt.ylabel('Амплитуда поля E (у.е.)')
+    plt.title('Сравнение ТГц импульсов: воздух vs образец')
+    plt.grid(True, linestyle=':')
+    plt.legend()
+    plt.show()
+
+
 def generate_synthetic_dataset(data_dir):
     """
     Генерирует синтетический набор данных ТГц спектроскопии для тестирования,
