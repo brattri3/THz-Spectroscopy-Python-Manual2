@@ -1,0 +1,161 @@
+% ============================================================
+% section6_interactivity.tex - Раздел 6: Интерактивная визуализация
+% ============================================================
+% !TeX program = xelatex
+% Компиляция: xelatex --shell-escape main.tex
+
+\section{Интерактивная визуализация семейства спектров}\label{sec:interactivity}
+
+В предыдущих разделах мы заложили полный инженерный фундамент: в Разделе~\ref{sec:database} мы спроектировали локальную СУБД с составными ключами и написали пакетный загрузчик \mycode{load_dataset_to_store}. В Разделе~\ref{sec:processing} мы научились пакетно обрабатывать все пары сигнал-фон и рассчитывать усреднённые спектры с помощью \mycode{process_dataset}. Теперь вся база данных полностью заполнена и готова к визуализации.
+
+Главная задача этого раздела --- создать быстродействующий интерактивный графический интерфейс с сеткой графиков (plot grid), объединяющий отображение временного импульса и его спектра с мгновенным переключением углов без мерцания экрана.
+
+\subsection{Интерактивный переключатель углов с сеткой графиков (Plot Grid)}
+
+Перейдем к созданию графического интерфейса. Мы разработаем полноценную интерактивную панель, использующую концепцию \textbf{сетки графиков} (plot grid). Окно программы будет разделено на две части:
+\begin{enumerate}
+    \item \textbf{Верхняя панель} --- временной ТГц-сигнал образца (сырой и заокненный) с наложенной огибающей Гауссова окна.
+    \item \textbf{Нижняя панель} --- соответствующий ему спектр пропускания в рабочем частотном диапазоне.
+\end{enumerate}
+
+При клике на радиокнопку выбора угла оба графика должны обновляться одновременно и без мерцания.
+
+\subsubsection{Профессиональное обновление данных в Matplotlib}
+
+\warning{Никогда не вызывайте \texttt{ax.clear()} внутри функций обратного вызова (callbacks) интерактивных виджетов. Очистка осей сбрасывает все подписи, сетку, масштабы и приводит к сильному мерцанию интерфейса. Профессиональный подход --- построить линии один раз с помощью метода \texttt{ax.plot()} при инициализации, сохранить ссылки на объекты \texttt{Line2D}, а затем быстро обновлять их координаты по оси Y с помощью метода \texttt{line.set\_ydata()}.}
+
+Давай добавим в наш файл \mycode{plots.py} логику интерактивного микро-приложения. Полный код модуля доступен в \textbf{\textit{Приложении~\ref{app:plots}}}.
+
+Рассмотрим ключевые моменты инициализации сетки графиков и функции обновления данных:
+
+\begin{listing}[H]
+	\caption{Логика обновления сетки графиков (\mycode{plots.py})}\label{lst:plot_grid}
+	\begin{minted}{python}
+# Создаем сетку из двух графиков (2 строки, 1 колонка)
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11, 8))
+plt.subplots_adjust(left=0.25, hspace=0.35) # освобождаем место слева
+
+# Строим начальные графики и сохраняем ссылки на объекты Line2D
+line_raw, = ax1.plot(t_sig, E_sig_dc, color='gray', alpha=0.5, label='Исходный')
+line_win, = ax1.plot(t_sig, E_sig_win, color='royalblue', label='Заокненный')
+line_env_pos, = ax1.plot(t_sig, win * max_amp, 'r--', label='Окно')
+line_env_neg, = ax1.plot(t_sig, -win * max_amp, 'r--')
+
+mask = (freqs >= config.F_MIN) & (freqs <= config.F_MAX)
+line_trans, = ax2.plot(freqs[mask], transmission[mask], color='darkgreen')
+
+# Функция обновления данных (вызывается при клике на виджет)
+def update_plot(label):
+    key = label_to_key[label]
+    a1, a2 = key[1], key[2]
+
+    # 1. Обновляем временную область
+    t_new, E_new = data_store[('signal_raw', a1, a2, 1)]
+    E_new_dc = spectrum.remove_dc(E_new)
+    E_new_win, win_new = spectrum.apply_gaussian_window(t_new, E_new_dc)
+    max_amp_new = np.max(np.abs(E_new_dc))
+
+    line_raw.set_ydata(E_new_dc)
+    line_win.set_ydata(E_new_win)
+    line_env_pos.set_ydata(win_new * max_amp_new)
+    line_env_neg.set_ydata(-win_new * max_amp_new)
+
+    ax1.set_title(f"Временная область. Угол 1: {a1}°")
+    ax1.relim()
+    ax1.autoscale_view(scalex=False, scaley=True)
+
+    # 2. Обновляем частотную область (спектр пропускания)
+    freqs_new, trans_new = data_store[key]
+    mask_new = (freqs_new >= config.F_MIN) & (freqs_new <= config.F_MAX)
+
+    line_trans.set_xdata(freqs_new[mask_new])
+    line_trans.set_ydata(trans_new[mask_new])
+
+    ax2.set_title(f"Частотная область. Угол 1: {a1}°")
+    ax2.relim()
+    ax2.autoscale_view(scalex=False, scaley=True)
+
+    # Запрашиваем перерисовку холста (холст обновится плавно)
+    fig.canvas.draw_idle()
+	\end{minted}
+\end{listing}
+
+
+
+\note{Методы \texttt{ax.relim()} и \texttt{ax.autoscale\_view()} заставляют Matplotlib автоматически пересчитать новые границы графиков под изменившийся сигнал, но делают это выборочно --- мы отключили автомасштабирование по оси X (\texttt{scalex=False}), чтобы временная шкала и диапазон частот оставались стабильными, а масштабировалась только амплитуда.}
+
+Внешний вид нашей интерактивной двухпанельной панели представлен на \figref{fig:6_1}.
+
+\smartfigure{fig6.1.png}{Двухпанельный графический интерфейс (plot grid) с переключателем RadioButtons для интерактивной инспекции сигналов и спектров.}{fig:6_1}
+
+\subsection{Визуализация семейства спектров}
+
+Помимо поштучной инспекции углов, физику важно увидеть общую картину --- семейство всех полученных спектров на одной координатной оси. Это позволит проследить плавную угловую модуляцию ТГц излучения.
+
+Напишем вспомогательную функцию \mycode{plot_all_transmissions()}, которая извлекает из СУБД все усредненные спектры и строит их, используя плавную цветовую карту градиента:
+
+\begin{listing}[H]
+	\caption{Построение семейства кривых пропускания (\mycode{plots.py})}\label{lst:plot_all_trans}
+	\begin{minted}{python}
+def plot_all_transmissions():
+    data_store = data_loader.load_dataset_to_store(config.DATA_DIR)
+    data_store = spectrum.process_dataset(data_store)
+
+    spectra_keys = sorted([k for k in data_store.keys() if k[0] == 'spec_avg'])
+
+    plt.figure(figsize=(10, 6))
+
+    # Создаем красивый градиент цветов от фиолетового к оранжевому
+    colors = plt.cm.plasma(np.linspace(0, 0.85, len(spectra_keys)))
+
+    for key, color in zip(spectra_keys, colors):
+        freqs, transmission = data_store[key]
+        mask = (freqs >= config.F_MIN) & (freqs <= config.F_MAX)
+        plt.plot(
+            freqs[mask],
+            transmission[mask],
+            label=f"Угол {key[1]}°",
+            color=color,
+            linewidth=1.5
+        )
+
+    plt.xlim(config.F_MIN, config.F_MAX)
+    plt.ylim(-0.05, 1.1)
+    plt.xlabel("Частота (ТГц)")
+    plt.ylabel("Коэффициент пропускания по мощности")
+    plt.title("Семейство спектров пропускания для различных углов")
+    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.legend(loc='lower left', ncol=2)
+    plt.tight_layout()
+    plt.show()
+	\end{minted}
+\end{listing}
+
+
+
+Использование конструкции \texttt{plt.cm.plasma(np.linspace(...))} позволяет автоматически распределить цвета линий по спектральной карте. Это делает графики эстетичными и легко читаемыми. Итоговый график семейства кривых пропускания показан на \figref{fig:6_2}.
+
+\smartfigure{fig6.2.png}{Семейство спектров пропускания образца при углах поворота поляризатора от 0 до 90 градусов.}{fig:6_2}
+
+\begin{minitaskbox}
+	\textbf{Мини-задание: Самостоятельный численный эксперимент с шириной окна} \\
+	Проведи простой и наглядный эксперимент с Гауссовым окном. Внеси небольшие изменения в файл \mycode{plots.py}: \\ \\
+	1. В функции \mycode{update_plot} замени жестко заданный вызов \mycode{apply_gaussian_window} так, чтобы можно было вручную передавать разные значения ширины $\sigma_t$ (например, $5.0$~пс, $20.0$~пс и $60.0$~пс). \\
+	2. Запусти программу с узким окном ($5.0$~пс) и посмотри, как сглаживается спектр на нижней панели. Куда исчезли резкие водяные провалы? \\
+	3. Запусти программу с очень широким окном ($60.0$~пс). Обрати внимание, как на спектре проступают тонкие атмосферные шумы. Сделай вывод об оптимальном балансе фильтрации.
+\end{minitaskbox}
+
+\subsection{Итоги раздела}
+
+В этом разделе мы совершили качественный инженерный скачок в визуализации данных:
+\begin{enumerate}
+    \item Освоили инструмент сетки графиков (plot grid) в Matplotlib и научились мгновенно обновлять её с помощью высокопроизводительного обновления объектов \mycode{Line2D}.
+    \item Построили интерактивный переключатель углов с RadioButtons, который без мерцания обновляет оба графика одновременно.
+    \item Написали функцию \mycode{plot_all_transmissions()}, строящую всё семейство спектров пропускания на одном рисунке с красивым цветовым градиентом.
+\end{enumerate}
+
+\note{\textbf{Как изменился проект в этом разделе:}\\
+В модуле \mycode{plots.py} добавлена логика интерактивного микро-приложения с RadioButtons и функцией \mycode{update_plot}.\\
+Также добавлена функция \mycode{plot_all_transmissions()} для построения семейства спектров.}
+
+Теперь наш программный каркас полностью готов к глубокому физическому анализу. В следующем разделе мы подключим математический аппарат Blanco и научимся сопоставлять теорию с экспериментальным пропусканием на фиксированной частоте!

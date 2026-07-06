@@ -65,15 +65,4 @@ You are a team of experts working on creating a methodological guide for process
   - *Student Check*: Every section must contain code that a student can realistically execute. Ensure paths, imports, and setups are clearly explained.
   - *Editor Check*: Ensure professional formatting, consistent terminology (with simple explanations for jargon), active voice, and typo-free text.
 
-## Environment Constraints
-- **CRITICAL: NO LATEX COMPILATION ALLOWED**: Do NOT attempt to compile LaTeX documents (using `xelatex`, `pdflatex`, etc.) or install LaTeX packages via `apt-get` or any other package manager within this environment. The environment is absolutely NOT meant for full document compilation, and package installations will freeze on interactive prompts, breaking the tool execution. We only work with text/code editing in this project. Provide LaTeX code edits and structural changes conceptually without ever trying to build or compile the PDF.
-- **CRITICAL: STRICT NATIVE TOOLS ONLY FOR FILE OPERATIONS**: You are strictly FORBIDDEN from using the `run_command` tool with shell utilities (like `grep`, `sed`, `awk`, `cat`, `ls`, `find`, or inline python scripts) for text replacement, file reading, or searching.
-  - You MUST use ONLY the native API tools provided by the environment:
-    1. `view_file` (to read lines from a file)
-    2. `edit_file` (to replace a contiguous block of text)
-    3. `multi_edit_file` (to replace multiple text blocks at once)
-    4. `create_file` (to create new files)
-    5. `delete_file` (to delete files)
-    6. `list_dir` (to view contents of directories)
-    7. `move` (to rename or move files/directories)
-  - DO NOT automate text processing with shell scripts. Use the native tools to open, read, and write to files.
+

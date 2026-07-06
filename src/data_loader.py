@@ -22,8 +22,9 @@ def parse_filename(filename: str):
     repetition = int(parts[2])
     bg_name = parts[3]
     
-    # Нормализуем угол первого ротатора с помощью готовой утилиты из Раздела 2
+    # Нормализуем углы поляризаторов с помощью готовой утилиты
     angle1 = normalize_angle(angle1)
+    angle2 = normalize_angle(angle2)
         
     return angle1, angle2, repetition, bg_name
 
@@ -33,9 +34,6 @@ def load_tds_data(filepath):
     Загружает временной ТГц сигнал из текстового файла.
     Возвращает два одномерных массива NumPy: время (t) и амплитуду (E).
     """
-    # unpack=True распаковывает колонки таблицы сразу в разные переменные.
-    # usecols=(0, 1) указывает NumPy читать только первые две колонки,
-    # полностью игнорируя третью колонку с позицией линии задержки.
     t, E = np.loadtxt(filepath, unpack=True, usecols=(0, 1))
     return t, E
 
