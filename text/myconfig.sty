@@ -250,6 +250,12 @@
 }
 \makeatother
 
+% ==================== CODE / PATH STYLING WITH NO MANUAL ESCAPING ====================
+% Макрос \mycode позволяет писать пути к файлам, переменные и любой код с символами
+% подчеркивания (_) напрямую, без ручного экранирования. Работает везде, включая заголовки!
+% Для централизованного изменения стиля достаточно поменять определение этого макроса.
+\newcommand{\mycode}[1]{\texttt{\detokenize{#1}}}
+
 % ==================== NOTES / WARNINGS / TIPS ====================
 \long\def\note#1{%
 	\begin{tcolorbox}[colback=RoyalBlue!5!white, colframe=RoyalBlue!75!black, title=\textbf{Примечание}, arc=2mm]
