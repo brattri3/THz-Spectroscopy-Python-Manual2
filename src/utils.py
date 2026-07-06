@@ -1,3 +1,5 @@
+import numpy as np
+
 def normalize_angle_conditional(angle: float) -> float:
     """
     Приводит произвольный угол к симметричному диапазону [-180, 180] градусов
@@ -19,6 +21,26 @@ def normalize_angle(angle: float) -> float:
     с использованием компактной арифметической формулы с остатком от деления.
     """
     return ((angle + 180.0) % 360.0) - 180.0
+
+
+def get_signal_pair(db: dict, angle1: float, angle2: float, rep: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Извлекает из базы данных (db) пару сигналов: сигнал образца и сигнал фона,
+    соответствующие заданным углам поляризаторов и номеру реплики.
+    Возвращает кортеж (t_bg, E_bg, t_sig, E_sig).
+    """
+    sig_key = ('signal_raw', angle1, angle2, rep)
+    bg_key = ('bg_raw', angle1, angle2, rep)
+    
+    if sig_key not in db:
+        raise KeyError(f"Ключ сигнала {sig_key} отсутствует в базе данных.")
+    if bg_key not in db:
+        raise KeyError(f"Ключ фона {bg_key} отсутствует в базе данных.")
+        
+    t_sig, E_sig = db[sig_key]
+    t_bg, E_bg = db[bg_key]
+    
+    return t_bg, E_bg, t_sig, E_sig
 
 
 if __name__ == "__main__":
