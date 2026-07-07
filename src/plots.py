@@ -59,25 +59,20 @@ def main_interactive():
     
     E_sig_dc = E_sig - np.mean(E_sig)
     E_bg_dc = E_bg - np.mean(E_bg)
-    norm_factor = np.max(np.abs(E_bg_dc))
-    
-    # Нормируем сигналы под референсный пик для отображения в диапазоне [-1.5, 1.5]
-    E_sig_norm = E_sig_dc / norm_factor
-    E_bg_norm = E_bg_dc / norm_factor
     
     peak_idx = np.argmax(np.abs(E_bg_dc))
     t_peak = t_bg[peak_idx]
     
     win = np.exp(-0.5 * ((t_sig - t_peak) / current_sigma) ** 2)
-    E_sig_win = E_sig_norm * win
+    E_sig_win = E_sig_dc * win
     
     win_bg = np.exp(-0.5 * ((t_bg - t_peak) / current_sigma) ** 2)
-    E_bg_win = E_bg_norm * win_bg
+    E_bg_win = E_bg_dc * win_bg
     
-    spec_sig = np.abs(rfft(E_sig_dc * win)) # БПФ берем от денормированных для физической точности
+    spec_sig = np.abs(rfft(E_sig_win))
     dt = t_sig[1] - t_sig[0]
     freqs = rfftfreq(len(E_sig_win), d=dt)
-    spec_bg = np.abs(rfft(E_bg_dc * win_bg))
+    spec_bg = np.abs(rfft(E_bg_win))
     spec_bg_safe = np.maximum(spec_bg, 1e-10)
     trans = (spec_sig / spec_bg_safe) ** 2
     
@@ -130,29 +125,24 @@ def main_interactive():
         
         E_s_dc = E_s - np.mean(E_s)
         E_b_dc = E_b - np.mean(E_b)
-        n_factor = np.max(np.abs(E_b_dc))
-        
-        E_s_norm = E_s_dc / n_factor
-        E_b_norm = E_b_dc / n_factor
         
         p_idx = np.argmax(np.abs(E_b_dc))
         t_p = t_b[p_idx]
         
         w = np.exp(-0.5 * ((t_s - t_p) / current_sigma) ** 2)
-        E_s_win = E_s_norm * w
+        E_s_win = E_s_dc * w
         
         w_b = np.exp(-0.5 * ((t_b - t_p) / current_sigma) ** 2)
-        E_b_win = E_b_norm * w_b
+        E_b_win = E_b_dc * w_b
         
-        # Расчет БПФ от исходных (денормированных) сигналов для точности
-        spec_s = np.abs(rfft(E_s_dc * w))
+        spec_s = np.abs(rfft(E_s_win))
         d_t = t_s[1] - t_s[0]
         fr = rfftfreq(len(E_s_win), d=d_t)
-        spec_b = np.abs(rfft(E_b_dc * w_b))
+        spec_b = np.abs(rfft(E_b_win))
         spec_b_s = np.maximum(spec_b, 1e-10)
         tr = (spec_s / spec_b_s) ** 2
         
-        # Обновляем графики временного импульса
+        # Обновляем графики временного импульса (без нормировки)
         line_bg.set_xdata(t_b)
         line_bg.set_ydata(E_b_win)
         line_sig.set_xdata(t_s)
