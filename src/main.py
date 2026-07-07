@@ -27,48 +27,6 @@ def load_first_repetition_dataset(data_dir):
                     
     return signals_raw, backgrounds
 
-def load_and_average_dataset(data_dir):
-    """ Загружает все реплики сигналов и усредняет их во временной области. """
-    data_store = data_loader.load_dataset_to_store(data_dir)
-    
-    angle_pairs = set()
-    for key in data_store.keys():
-        if key[0] == 'signal_raw':
-            angle_pairs.add((key[1], key[2]))
-            
-    signals_avg = {}
-    backgrounds_avg = {}
-    
-    for angle1, angle2 in angle_pairs:
-        ang_pair = (angle1, angle2)
-        
-        # Сбор и усреднение сигналов образца
-        sig_measurements = []
-        t_sig_common = None
-        for key, val in data_store.items():
-            if key[0] == 'signal_raw' and key[1] == angle1 and key[2] == angle2:
-                t_sig, E_sig = val
-                sig_measurements.append(E_sig)
-                if t_sig_common is None:
-                    t_sig_common = t_sig
-                    
-        # Сбор и усреднение сигналов фона
-        bg_measurements = []
-        t_bg_common = None
-        for key, val in data_store.items():
-            if key[0] == 'bg_raw' and key[1] == angle1 and key[2] == angle2:
-                t_bg, E_bg = val
-                bg_measurements.append(E_bg)
-                if t_bg_common is None:
-                    t_bg_common = t_bg
-                    
-        if sig_measurements:
-            signals_avg[ang_pair] = (t_sig_common, np.mean(sig_measurements, axis=0))
-        if bg_measurements:
-            backgrounds_avg[ang_pair] = (t_bg_common, np.mean(bg_measurements, axis=0))
-            
-    return signals_avg, backgrounds_avg
-
 def get_experimental_transmission_at_freq(spectra, target_freq):
     """ Извлекает экспериментальную угловую зависимость пропускания для заданной частоты. """
     raw_keys = sorted(list(spectra.keys()))
@@ -84,40 +42,55 @@ def get_experimental_transmission_at_freq(spectra, target_freq):
         
     return angles, np.array(transmission_pow)
 
-def compute_spectra_with_params(signals, backgrounds, pad_factor, sigma):
-    """ Рассчитывает спектры пропускания при заданных Pad Factor и полуширине окна. """
+def compute_spectra_with_params(data_store, pad_factor, sigma):
+    """ Рассчитывает спектры пропускания попарно для каждой реплики и усредняет их в частотной области. """
     spectra = {}
-    for angle_pair, (t_sig, E_sig) in signals.items():
-        if angle_pair in backgrounds:
-            t_bg, E_bg = backgrounds[angle_pair]
-        else:
-            bg_key = list(backgrounds.keys())[0]
-            t_bg, E_bg = backgrounds[bg_key]
+    angle_pairs = sorted(list(set((k[1], k[2]) for k in data_store.keys() if k[0] == 'signal_raw')))
+    
+    for angle1, angle2 in angle_pairs:
+        ang_pair = (angle1, angle2)
+        reps = sorted([k[3] for k in data_store.keys() if k[0] == 'signal_raw' and k[1] == angle1 and k[2] == angle2])
+        
+        reps_trans = []
+        freqs_common = None
+        
+        for rep in reps:
+            sig_key = ('signal_raw', angle1, angle2, rep)
+            bg_key = ('bg_raw', angle1, angle2, rep)
             
-        E_sig_dc = E_sig - np.mean(E_sig)
-        E_bg_dc = E_bg - np.mean(E_bg)
-        
-        peak_idx = np.argmax(np.abs(E_bg_dc))
-        t_peak = t_bg[peak_idx]
-        
-        win_sig = np.exp(-0.5 * ((t_sig - t_peak) / sigma) ** 2)
-        E_sig_win = E_sig_dc * win_sig
-        
-        win_bg = np.exp(-0.5 * ((t_bg - t_peak) / sigma) ** 2)
-        E_bg_win = E_bg_dc * win_bg
-        
-        N_sig_padded = len(E_sig_win) * int(pad_factor)
-        dt = t_sig[1] - t_sig[0]
-        spec_sig = np.abs(rfft(E_sig_win, n=N_sig_padded))
-        freqs = rfftfreq(N_sig_padded, d=dt)
-        
-        N_bg_padded = len(E_bg_win) * int(pad_factor)
-        spec_bg = np.abs(rfft(E_bg_win, n=N_bg_padded))
-        
-        spec_bg_safe = np.maximum(spec_bg, 1e-10)
-        trans = (spec_sig / spec_bg_safe) ** 2
-        spectra[angle_pair] = (freqs, trans)
-        
+            if sig_key in data_store and bg_key in data_store:
+                t_sig, E_sig = data_store[sig_key]
+                t_bg, E_bg = data_store[bg_key]
+                
+                E_sig_dc = E_sig - np.mean(E_sig)
+                E_bg_dc = E_bg - np.mean(E_bg)
+                
+                peak_idx = np.argmax(np.abs(E_bg_dc))
+                t_peak = t_bg[peak_idx]
+                
+                win_sig = np.exp(-0.5 * ((t_sig - t_peak) / sigma) ** 2)
+                E_sig_win = E_sig_dc * win_sig
+                
+                win_bg = np.exp(-0.5 * ((t_bg - t_peak) / sigma) ** 2)
+                E_bg_win = E_bg_dc * win_bg
+                
+                N_sig_padded = len(E_sig_win) * int(pad_factor)
+                dt = t_sig[1] - t_sig[0]
+                spec_sig = np.abs(rfft(E_sig_win, n=N_sig_padded))
+                freqs = rfftfreq(N_sig_padded, d=dt)
+                
+                N_bg_padded = len(E_bg_win) * int(pad_factor)
+                spec_bg = np.abs(rfft(E_bg_win, n=N_bg_padded))
+                
+                spec_bg_safe = np.maximum(spec_bg, 1e-10)
+                trans = (spec_sig / spec_bg_safe) ** 2
+                reps_trans.append(trans)
+                if freqs_common is None:
+                    freqs_common = freqs
+                    
+        if reps_trans:
+            spectra[ang_pair] = (freqs_common, np.mean(reps_trans, axis=0))
+            
     return spectra
 
 def run_step1_time_domain(signals_raw, backgrounds):
@@ -228,7 +201,7 @@ def run_step1_time_domain(signals_raw, backgrounds):
     plt.show()
     return result
 
-def run_step2_frequency_domain(signals, backgrounds, win_params):
+def run_step2_frequency_domain(data_store, win_params):
     print("\n--- Шаг 2: Анализ спектров пропускания для всех углов ---")
     sigma = win_params['sigma']
     pad_init = config.PAD_FACTOR
@@ -236,46 +209,62 @@ def run_step2_frequency_domain(signals, backgrounds, win_params):
     fig, (ax_pct, ax_db) = plt.subplots(1, 2, figsize=(12, 6))
     plt.subplots_adjust(bottom=0.22, left=0.08, right=0.95, wspace=0.25)
     
-    sorted_keys = sorted(list(signals.keys()))
+    angle_pairs = sorted(list(set((k[1], k[2]) for k in data_store.keys() if k[0] == 'signal_raw')))
     
     def compute_all_transmissions(pad):
         all_trans = {}
-        for key in sorted_keys:
-            t_sig, E_sig = signals[key]
-            t_bg, E_bg = backgrounds[key]
+        for angle1, angle2 in angle_pairs:
+            reps = sorted([k[3] for k in data_store.keys() if k[0] == 'signal_raw' and k[1] == angle1 and k[2] == angle2])
             
-            E_sig_dc = E_sig - np.mean(E_sig)
-            E_bg_dc = E_bg - np.mean(E_bg)
+            reps_trans = []
+            freqs_common = None
             
-            peak_idx_bg = np.argmax(np.abs(E_bg_dc))
-            t_peak = t_bg[peak_idx_bg]
-            
-            win_sig = np.exp(-0.5 * ((t_sig - t_peak) / sigma) ** 2)
-            E_sig_win = E_sig_dc * win_sig
-            
-            win_bg = np.exp(-0.5 * ((t_bg - t_peak) / sigma) ** 2)
-            E_bg_win = E_bg_dc * win_bg
-            
-            N_sig_padded = len(E_sig_win) * int(pad)
-            dt = t_sig[1] - t_sig[0]
-            spec_sig = np.abs(rfft(E_sig_win, n=N_sig_padded))
-            freqs = rfftfreq(N_sig_padded, d=dt)
-            
-            N_bg_padded = len(E_bg_win) * int(pad)
-            spec_bg = np.abs(rfft(E_bg_win, n=N_bg_padded))
-            
-            spec_bg_safe = np.maximum(spec_bg, 1e-10)
-            trans = (spec_sig / spec_bg_safe) ** 2
-            all_trans[key[0]] = (freqs, trans)
+            for rep in reps:
+                sig_key = ('signal_raw', angle1, angle2, rep)
+                bg_key = ('bg_raw', angle1, angle2, rep)
+                
+                if sig_key in data_store and bg_key in data_store:
+                    t_sig, E_sig = data_store[sig_key]
+                    t_bg, E_bg = data_store[bg_key]
+                    
+                    E_sig_dc = E_sig - np.mean(E_sig)
+                    E_bg_dc = E_bg - np.mean(E_bg)
+                    
+                    peak_idx_bg = np.argmax(np.abs(E_bg_dc))
+                    t_peak = t_bg[peak_idx_bg]
+                    
+                    win_sig = np.exp(-0.5 * ((t_sig - t_peak) / sigma) ** 2)
+                    E_sig_win = E_sig_dc * win_sig
+                    
+                    win_bg = np.exp(-0.5 * ((t_bg - t_peak) / sigma) ** 2)
+                    E_bg_win = E_bg_dc * win_bg
+                    
+                    N_sig_padded = len(E_sig_win) * int(pad)
+                    dt = t_sig[1] - t_sig[0]
+                    spec_sig = np.abs(rfft(E_sig_win, n=N_sig_padded))
+                    freqs = rfftfreq(N_sig_padded, d=dt)
+                    
+                    N_bg_padded = len(E_bg_win) * int(pad)
+                    spec_bg = np.abs(rfft(E_bg_win, n=N_bg_padded))
+                    
+                    spec_bg_safe = np.maximum(spec_bg, 1e-10)
+                    trans = (spec_sig / spec_bg_safe) ** 2
+                    reps_trans.append(trans)
+                    if freqs_common is None:
+                        freqs_common = freqs
+            if reps_trans:
+                all_trans[angle1] = (freqs_common, np.mean(reps_trans, axis=0))
         return all_trans
 
     all_trans = compute_all_transmissions(pad_init)
-    colors = plt.cm.plasma(np.linspace(0, 0.85, len(sorted_keys)))
+    colors = plt.cm.plasma(np.linspace(0, 0.85, len(angle_pairs)))
     
     lines_pct = []
     lines_db = []
     
-    for (ang_key, (freqs, trans)), color in zip(all_trans.items(), colors):
+    sorted_angles = sorted(list(all_trans.keys()))
+    for ang_key, color in zip(sorted_angles, colors):
+        freqs, trans = all_trans[ang_key]
         mask = (freqs >= config.F_MIN) & (freqs <= config.F_MAX)
         l_pct, = ax_pct.plot(freqs[mask], trans[mask] * 100, label=f'{ang_key}°', color=color, linewidth=1.5)
         l_db, = ax_db.plot(freqs[mask], 10 * np.log10(np.maximum(trans[mask], 1e-12)), label=f'{ang_key}°', color=color, linewidth=1.5)
@@ -685,7 +674,6 @@ def main():
     print("=================================================================")
     
     signals_raw, backgrounds = load_first_repetition_dataset(config.DATA_DIR)
-    signals_avg, backgrounds_avg = load_and_average_dataset(config.DATA_DIR)
     
     if not signals_raw or not backgrounds:
         print("Ошибка: данные для анализа не найдены!")
@@ -694,11 +682,14 @@ def main():
     # Шаг 1: Фильтрация во временной области на первом повторении сигналов
     win_params = run_step1_time_domain(signals_raw, backgrounds)
     
-    # Шаг 2: Спектральный анализ на усредненных по всем проходам сигналах
-    dsp_params = run_step2_frequency_domain(signals_avg, backgrounds_avg, win_params)
+    # Загружаем полную сырую БД для физически корректного усреднения спектров в частотной области
+    data_store = data_loader.load_dataset_to_store(config.DATA_DIR)
+    
+    # Шаг 2: Спектральный анализ на усредненных по всем проходам спектрах
+    dsp_params = run_step2_frequency_domain(data_store, win_params)
     
     spectra = compute_spectra_with_params(
-        signals_avg, backgrounds_avg, 
+        data_store, 
         pad_factor=dsp_params['pad_factor'], 
         sigma=dsp_params['sigma']
     )

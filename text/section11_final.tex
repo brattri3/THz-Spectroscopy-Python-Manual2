@@ -26,17 +26,19 @@
 \begin{minted}{python}
 def main():
     signals_raw, backgrounds = load_first_repetition_dataset(config.DATA_DIR)
-    signals_avg, backgrounds_avg = load_and_average_dataset(config.DATA_DIR)
     
     # Шаг 1: Фильтрация во временной области на первом повторении сигналов
     win_params = run_step1_time_domain(signals_raw, backgrounds)
     
-    # Шаг 2: Спектральный анализ на усредненных по всем проходам сигналах
-    dsp_params = run_step2_frequency_domain(signals_avg, backgrounds_avg, win_params)
+    # Загружаем полную сырую БД для физически корректного усреднения спектров в частотной области
+    data_store = data_loader.load_dataset_to_store(config.DATA_DIR)
+    
+    # Шаг 2: Спектральный анализ на усредненных по всем проходам спектрах
+    dsp_params = run_step2_frequency_domain(data_store, win_params)
     
     # Расчет спектров по настроенным на предыдущих шагах параметрам
     spectra = compute_spectra_with_params(
-        signals_avg, backgrounds_avg, 
+        data_store, 
         pad_factor=dsp_params['pad_factor'], 
         sigma=dsp_params['sigma']
     )
@@ -54,7 +56,7 @@ def main():
 
 \begin{syntaxdesc}
     \item[Загрузка сырых сигналов \mycode{load_first_repetition_dataset}] Функция загрузки первой реплики сигналов образца и фона для калибровки временного окна на шаге 1.
-    \item[Усреднение сигналов \mycode{load_and_average_dataset}] Загружает и усредняет все повторные измерения по каждому углу для спектрального анализа на последующих шагах.
+    \item[Загрузка полной базы данных \mycode{load_dataset_to_store}] Загружает полную сырую БД в память для последующего попарного расчета спектров и их усреднения на частотной сетке.
     \item[Временная фильтрация \mycode{run_step1_time_domain}] Вызывает интерактивное окно шага 1 для выбора оптимальной полуширины временного фильтра Гаусса.
     \item[Спектральный расчет \mycode{run_step2_frequency_domain}] Запускает окно шага 2 для оценки влияния коэффициента дополнения нулями (Pad Factor).
     \item[Сопоставление на частоте \mycode{run_step3_interactive_fit}] Вызывает интерактивный стенд шага 3 для сопоставления модели Бланко с экспериментом.
