@@ -6,9 +6,11 @@ EPS = 1e-12
 def compute_C(m: int, p_over_lambda: float) -> complex:
     """
     Вычисляет параметр C_m для m-й гармоники ряда Бланко.
+    Добавлено бесконечно малое мнимое затухание для исключения
+    деления на ноль при совпадении периода с длиной волны (резонанс).
     """
     val = m**2 - p_over_lambda**2
-    return np.sqrt(val + 0j)
+    return np.sqrt(val + 1j * 1e-9)
 
 
 def safe_log(x: float) -> float:
