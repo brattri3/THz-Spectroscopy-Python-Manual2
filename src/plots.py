@@ -45,125 +45,172 @@ def main_interactive():
         print("Пожалуйста, распакуйте архив с экспериментальными данными.")
         return
     
+    # Импортируем локально дополнительные инструменты для ЦОС и интерактивности
+    from matplotlib.widgets import Slider
+    from scipy.fft import rfft, rfftfreq
+    
     # 1. Загружаем экспериментальный датасет в СУБД-хранилище
     data_store = data_loader.load_dataset_to_store(config.DATA_DIR)
     
-    # 2. Выполняем пакетную обработку всей базы данных
-    data_store = spectrum.process_dataset(data_store)
+    # Извлекаем метаданные: уникальные углы и повторения
+    signal_keys = [k for k in data_store.keys() if k[0] == 'signal_raw']
+    angles1 = sorted(list(set(k[1] for k in signal_keys)))
+    reps = sorted(list(set(k[3] for k in signal_keys)))
     
-    # Получаем список уникальных углов для переключения
-    # Фильтруем теги 'spec_avg' в базе данных
-    spectra_keys = sorted([k for k in data_store.keys() if k[0] == 'spec_avg'])
-    if not spectra_keys:
-        print("Ошибка: обработанные спектры не найдены в базе данных!")
+    if not angles1 or not reps:
+        print("Ошибка: необработанные данные не найдены в базе!")
         return
-        
-    # Преобразуем ключи в строковые метки для виджета RadioButtons
-    label_to_key = {f"Угол {k[1]}°": k for k in spectra_keys}
-    labels = list(label_to_key.keys())
     
-    initial_label = labels[0]
-    initial_key = label_to_key[initial_label]
-    angle1, angle2 = initial_key[1], initial_key[2]
+    # Начальное интерактивное состояние
+    current_angle = angles1[0]
+    current_rep = reps[0]
+    current_sigma = 30.0
     
     # 3. Подготавливаем фигуру и сетку графиков (Plot Grid)
-    # Создаем вертикальную сетку из двух графиков (временной сигнал и спектр)
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11, 8))
-    plt.subplots_adjust(left=0.25, hspace=0.35) # Оставляем место слева для панели радиокнопок
+    plt.subplots_adjust(left=0.25, bottom=0.15, hspace=0.35)
     
-    # Получаем сырой временной сигнал (первое повторение для начального угла)
-    rep_init = 1
-    sig_key_init = ('signal_raw', angle1, angle2, rep_init)
-    t_sig, E_sig = data_store[sig_key_init]
+    # Вспомогательный метод для получения ключей по углу первого поляризатора и повторению
+    def get_keys(angle, rep):
+        sig_key = None
+        bg_key = None
+        for k in signal_keys:
+            if k[1] == angle and k[3] == rep:
+                sig_key = k
+                bg_k = ('bg_raw', k[1], k[2], rep)
+                if bg_k in data_store:
+                    bg_key = bg_k
+                break
+        return sig_key, bg_key
+
+    # Инициализационный расчет линий
+    sig_k, bg_k = get_keys(current_angle, current_rep)
+    t_sig, E_sig = data_store[sig_k]
+    t_bg, E_bg = data_store[bg_k]
     
-    # Очищаем от DC и накладываем окно
-    E_sig_dc = spectrum.remove_dc(E_sig)
-    E_sig_win, win = spectrum.apply_gaussian_window(t_sig, E_sig_dc)
+    E_sig_dc = E_sig - np.mean(E_sig)
+    E_bg_dc = E_bg - np.mean(E_bg)
+    peak_idx = np.argmax(np.abs(E_bg_dc))
+    t_peak = t_bg[peak_idx]
     
-    # Получаем спектр пропускания из СУБД для начального угла
-    freqs, transmission = data_store[initial_key]
+    win = np.exp(-0.5 * ((t_sig - t_peak) / current_sigma) ** 2)
+    E_sig_win = E_sig_dc * win
+    
+    win_bg = np.exp(-0.5 * ((t_bg - t_peak) / current_sigma) ** 2)
+    E_bg_win = E_bg_dc * win_bg
+    
+    spec_sig = np.abs(rfft(E_sig_win))
+    dt = t_sig[1] - t_sig[0]
+    freqs = rfftfreq(len(E_sig_win), d=dt)
+    spec_bg = np.abs(rfft(E_bg_win))
+    spec_bg_safe = np.maximum(spec_bg, 1e-10)
+    trans = (spec_sig / spec_bg_safe) ** 2
     
     # 4. Строим начальные линии на ax1 (временная область)
-    line_raw, = ax1.plot(
-        t_sig, E_sig_dc, color='gray', alpha=0.5, 
-        label='Исходный сигнал (без DC)'
-    )
-    line_win, = ax1.plot(
-        t_sig, E_sig_win, color='royalblue', linewidth=1.5, 
-        label='Сигнал после окна'
-    )
-    # Показываем огибающую окна (масштабированную под максимум сигнала)
+    line_raw, = ax1.plot(t_sig, E_sig_dc, color='gray', alpha=0.5, label='Исходный сигнал (без DC)')
+    line_win, = ax1.plot(t_sig, E_sig_win, color='royalblue', linewidth=1.5, label='Сигнал после окна')
     max_amp = np.max(np.abs(E_sig_dc))
     line_envelope_pos, = ax1.plot(t_sig, win * max_amp, 'r--', alpha=0.7, label='Огибающая окна')
     line_envelope_neg, = ax1.plot(t_sig, -win * max_amp, 'r--', alpha=0.7)
     
     ax1.set_xlabel('Время задержки (пс)')
     ax1.set_ylabel('Амплитуда поля E (у.е.)')
-    ax1.set_title(f'Временная область. Угол 1: {angle1}°')
+    ax1.set_title(f'Временной ТГц-импульс (Угол {current_angle}°, Повторение {current_rep})')
     ax1.grid(True, linestyle=':', alpha=0.6)
     ax1.legend(loc='upper right', fontsize=9)
     
     # 5. Строим начальные линии на ax2 (частотная область)
     mask = (freqs >= config.F_MIN) & (freqs <= config.F_MAX)
-    line_trans, = ax2.plot(
-        freqs[mask], transmission[mask], color='darkgreen', linewidth=2,
-        label=r'Пропускание $T(\nu)$'
-    )
+    line_trans, = ax2.plot(freqs[mask], trans[mask], color='darkgreen', linewidth=2, label=r'Пропускание $T(\nu)$')
     ax2.set_xlabel('Частота (ТГц)')
-    ax2.set_ylabel('Коэффициент пропускания по мощности')
-    ax2.set_title(f'Частотная область (Пропускание). Угол 1: {angle1}°')
+    ax2.set_ylabel('Пропускание по мощности')
+    ax2.set_title(f'Спектр пропускания (Угол {current_angle}°, Повторение {current_rep})')
     ax2.set_xlim(config.F_MIN, config.F_MAX)
     ax2.set_ylim(-0.05, 1.1)
     ax2.grid(True, linestyle=':', alpha=0.6)
     ax2.legend(loc='lower left', fontsize=9)
     
-    # 6. Создаем панель радиокнопок слева
-    ax_radio = plt.axes([0.02, 0.3, 0.16, 0.4], facecolor='#f5f5f5')
-    radio = RadioButtons(ax_radio, labels)
+    # 6. Панели управления (Виджеты) слева
+    ax_radio_angle = plt.axes([0.02, 0.5, 0.16, 0.35], facecolor='#f5f5f5')
+    radio_angle = RadioButtons(ax_radio_angle, [f"Угол {a}°" for a in angles1])
     
-    # 7. Функция обратного вызова для мгновенного обновления данных в сетке
-    def update_plot(label):
-        key = label_to_key[label]
-        a1, a2 = key[1], key[2]
+    ax_radio_rep = plt.axes([0.02, 0.22, 0.16, 0.18], facecolor='#f5f5f5')
+    radio_rep = RadioButtons(ax_radio_rep, [f"Повтор {r}" for r in reps])
+    
+    ax_slider_sigma = plt.axes([0.25, 0.05, 0.5, 0.03], facecolor='#f5f5f5')
+    slider_sigma = Slider(ax_slider_sigma, 'Ширина окна (пс)', 5.0, 300.0, valinit=current_sigma, valstep=1.0)
+    
+    # 7. Функция обновления графиков
+    def update(val):
+        nonlocal current_angle, current_rep, current_sigma
+        current_sigma = slider_sigma.val
         
-        # Обновляем временные сигналы (берем реплику 1)
-        sig_key = ('signal_raw', a1, a2, 1)
-        if sig_key in data_store:
-            t_new, E_new = data_store[sig_key]
-            E_new_dc = spectrum.remove_dc(E_new)
-            E_new_win, win_new = spectrum.apply_gaussian_window(t_new, E_new_dc)
+        sig_k, bg_k = get_keys(current_angle, current_rep)
+        if sig_k is None or bg_k is None:
+            return
             
-            line_raw.set_xdata(t_new)
-            line_raw.set_ydata(E_new_dc)
-            line_win.set_xdata(t_new)
-            line_win.set_ydata(E_new_win)
-            
-            # Обновляем огибающую окна
-            max_amp_new = np.max(np.abs(E_new_dc))
-            line_envelope_pos.set_xdata(t_new)
-            line_envelope_pos.set_ydata(win_new * max_amp_new)
-            line_envelope_neg.set_xdata(t_new)
-            line_envelope_neg.set_ydata(-win_new * max_amp_new)
-            
-            ax1.set_title(f'Временная область. Угол 1: {a1}°')
-            ax1.relim()
-            ax1.autoscale_view(scalex=False, scaley=True)
-            
-        # Обновляем спектр пропускания
-        freqs_new, trans_new = data_store[key]
-        mask_new = (freqs_new >= config.F_MIN) & (freqs_new <= config.F_MAX)
+        t_s, E_s = data_store[sig_k]
+        t_b, E_b = data_store[bg_k]
         
-        line_trans.set_xdata(freqs_new[mask_new])
-        line_trans.set_ydata(trans_new[mask_new])
+        E_s_dc = E_s - np.mean(E_s)
+        E_b_dc = E_b - np.mean(E_b)
+        p_idx = np.argmax(np.abs(E_b_dc))
+        t_p = t_b[p_idx]
         
-        ax2.set_title(f'Частотная область (Пропускание). Угол 1: {a1}°')
+        w = np.exp(-0.5 * ((t_s - t_p) / current_sigma) ** 2)
+        E_s_win = E_s_dc * w
+        
+        w_b = np.exp(-0.5 * ((t_b - t_p) / current_sigma) ** 2)
+        E_b_win = E_b_dc * w_b
+        
+        spec_s = np.abs(rfft(E_s_win))
+        d_t = t_s[1] - t_s[0]
+        fr = rfftfreq(len(E_s_win), d=d_t)
+        spec_b = np.abs(rfft(E_b_win))
+        spec_b_s = np.maximum(spec_b, 1e-10)
+        tr = (spec_s / spec_b_s) ** 2
+        
+        # Обновляем графики временного импульса
+        line_raw.set_xdata(t_s)
+        line_raw.set_ydata(E_s_dc)
+        line_win.set_xdata(t_s)
+        line_win.set_ydata(E_s_win)
+        
+        max_amp_new = np.max(np.abs(E_s_dc))
+        line_envelope_pos.set_xdata(t_s)
+        line_envelope_pos.set_ydata(w * max_amp_new)
+        line_envelope_neg.set_xdata(t_s)
+        line_envelope_neg.set_ydata(-w * max_amp_new)
+        
+        ax1.set_title(f'Временной ТГц-импульс (Угол {current_angle}°, Повторение {current_rep})')
+        ax1.relim()
+        ax1.autoscale_view(scalex=False, scaley=True)
+        
+        # Обновляем графики спектров пропускания
+        mask_new = (fr >= config.F_MIN) & (fr <= config.F_MAX)
+        line_trans.set_xdata(fr[mask_new])
+        line_trans.set_ydata(tr[mask_new])
+        
+        ax2.set_title(f'Спектр пропускания (Угол {current_angle}°, Повторение {current_rep})')
         ax2.relim()
         ax2.autoscale_view(scalex=False, scaley=True)
         
-        # Обновляем фигуру
         fig.canvas.draw_idle()
         
-    radio.on_clicked(update_plot)
+    def on_angle_changed(label):
+        nonlocal current_angle
+        current_angle = int(label.replace("Угол ", "").replace("°", ""))
+        update(None)
+        
+    def on_rep_changed(label):
+        nonlocal current_rep
+        current_rep = int(label.replace("Повтор ", ""))
+        update(None)
+        
+    radio_angle.on_clicked(on_angle_changed)
+    radio_rep.on_clicked(on_rep_changed)
+    slider_sigma.on_changed(update)
+    
     plt.show()
 
 
