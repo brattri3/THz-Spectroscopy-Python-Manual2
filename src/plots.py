@@ -199,12 +199,56 @@ def plot_all_transmissions():
     plt.show()
 
 
+def plot_polarizer_theory_characteristics(p=config.P_DEFAULT, d=config.D_DEFAULT):
+    """
+    Строит теоретические спектры пропускания по амплитуде для перпендикулярной
+    и параллельной составляющих поляризатора в диапазоне от 0.1 до 100 ТГц.
+    """
+    import theoretical
+    
+    # Задаем массив частот на логарифмической шкале от 0.1 до 100 ТГц
+    freqs_THz = np.logspace(-1, 2, 500)
+    c_light = 3e8
+    
+    t_perp_amps = []
+    t_par_amps = []
+    
+    for f in freqs_THz:
+        lambda_m = c_light / (f * 1e12)
+        p_over_lambda = p / lambda_m
+        d_over_p = d / p
+        
+        t_perp = theoretical.compute_t_perp(p_over_lambda, d_over_p)
+        t_par = theoretical.compute_t_par(p_over_lambda, d_over_p)
+        
+        t_perp_amps.append(np.abs(t_perp))
+        t_par_amps.append(np.abs(t_par))
+        
+    plt.figure(figsize=(10, 5))
+    plt.semilogx(freqs_THz, t_perp_amps, color='royalblue', label=r'Перпендикулярная составляющая $|t_\perp|$', linewidth=2)
+    plt.semilogx(freqs_THz, t_par_amps, color='crimson', label=r'Параллельная составляющая $|t_\parallel|$', linewidth=2)
+    
+    # Отмечаем резонансную частоту (Wood's anomaly) при lambda = p
+    f_res = (c_light / p) / 1e12
+    plt.axvline(f_res, color='orange', linestyle='--', label=f'Аномалия Вуда ({f_res:.1f} ТГц)')
+    
+    plt.xlim(0.1, 100)
+    plt.ylim(-0.05, 1.15)
+    plt.xlabel('Частота (ТГц)')
+    plt.ylabel('Амплитудный коэффициент пропускания')
+    plt.title(f'Спектры пропускания поляризатора ($p={p*1e6:.1f}$ мкм, $d={d*1e6:.1f}$ мкм)')
+    plt.grid(True, which="both", linestyle=':', alpha=0.5)
+    plt.legend(loc='center left')
+    plt.tight_layout()
+    plt.show()
+
+
 if __name__ == '__main__':
     # Переключим бэкенд на неинтерактивный для автономного теста при компиляции/линте
     import matplotlib
     matplotlib.use('Agg')
     
-    print("Запуск тестирования interactive_plots.py...")
+    print("Запуск тестирования plots.py...")
     path = Path(config.DATA_DIR)
     if not path.exists() or not list(path.glob("*.txt")):
         print("Ошибка: Тестовые данные отсутствуют. Пропуск тестирования.")
@@ -213,4 +257,8 @@ if __name__ == '__main__':
         data_store = spectrum.process_dataset(data_store)
         print("  - Загружено ключей в базу:", len(data_store))
         print("  - Спектральные ключи:", sorted([k for k in data_store.keys() if k[0] == 'spec_avg']))
+        
+        # Проверяем работу новой теоретической функции
+        print("  - Расчет теоретических спектров...")
+        plot_polarizer_theory_characteristics()
     print("Тестирование завершено успешно.")
