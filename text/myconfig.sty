@@ -233,8 +233,15 @@
 	autogobble,
 	linenos=true,
 	style=friendly,
-	numbersep=6pt
+	numbersep=6pt,
+	showspaces=true
 }
+
+% Мягкий серый маркер отступа вместо стандартного \textvisiblespace
+% Помогает студентам считать уровни вложенности в Python-коде
+\makeatletter
+\renewcommand{\FancyVerbSpace}{\textcolor[RGB]{200,210,220}{\raisebox{0.3ex}{\scalebox{0.55}{$\bullet$}}}}
+\makeatother
 
 % Автоматическое оборачивание всех блоков minted в tcolorbox для сплошной заливки фона
 \BeforeBeginEnvironment{minted}{%

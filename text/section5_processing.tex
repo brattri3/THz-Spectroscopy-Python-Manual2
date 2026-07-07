@@ -278,6 +278,9 @@ def process_dataset(data_store: dict) -> dict:
                 if freqs_common is None:
                     freqs_common = freqs
 
+\end{minted}
+\newpage
+\begin{minted}[firstnumber=39, autogobble=false]{python}
         if transmissions:
             # Математическое усреднение для компенсации дрейфа
             trans_avg = np.mean(transmissions, axis=0)
