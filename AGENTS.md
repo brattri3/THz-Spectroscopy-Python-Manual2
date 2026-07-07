@@ -78,5 +78,12 @@ You are a team of experts working on creating a methodological guide for process
   - When changes are done, commit and push them to the **`main`** branch on GitHub.
   - Then, run a `git pull origin main` command inside the user's desktop workspace `H:\Рабочий стол\Latex проекты\THz-Spectroscopy-Python-Manual2` to keep it synchronized.
   - Inform the user of the successful compilation, and tell them they can view the updated PDF using their local shortcut.
+- **Adobe Reader Lock Prevention (Interactive Prompt)**:
+  - Before running ANY LaTeX compilation command (e.g. `xelatex`), the agent MUST explicitly ask the user a multiple-choice question using the `ask_question` tool.
+  - The question title MUST be: "Напоминание: пожалуйста, закройте приложение Adobe Reader, чтобы избежать блокировки файла main.pdf при сборке."
+  - It must have exactly two options:
+    1. `(Recommended) Ок (я закрыл Adobe Reader, запускай компиляцию)`
+    2. `Не надо компилировать`
+  - The agent must proceed with compilation only if the user selects the first option. If they select the second option, the compilation must be cancelled.
 
 
