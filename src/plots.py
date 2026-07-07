@@ -30,13 +30,6 @@ def main_interactive():
         print("Ошибка: необработанные данные не найдены в базе!")
         return
     
-    # Находим максимальную амплитуду среди всех сигналов базы данных для фиксации оси Y
-    max_amp_global = 0.0
-    for k, val in data_store.items():
-        if k[0] in ('signal_raw', 'bg_raw'):
-            t_val, E_val = val
-            max_amp_global = max(max_amp_global, np.max(np.abs(E_val - np.mean(E_val))))
-    
     # Начальное интерактивное состояние
     current_angle = angles1[0]
     current_rep = reps[0]
@@ -45,9 +38,6 @@ def main_interactive():
     # 3. Подготавливаем фигуру и сетку графиков (Plot Grid)
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11, 8))
     plt.subplots_adjust(left=0.25, bottom=0.15, hspace=0.35)
-    
-    # Создаем вторую ось Y для отображения ненормированного окна от 0 до 1
-    ax1_twin = ax1.twinx()
     
     # Вспомогательный метод для получения ключей по углу первого поляризатора и повторению
     def get_keys(angle, rep):
@@ -69,44 +59,41 @@ def main_interactive():
     
     E_sig_dc = E_sig - np.mean(E_sig)
     E_bg_dc = E_bg - np.mean(E_bg)
+    norm_factor = np.max(np.abs(E_bg_dc))
+    
+    # Нормируем сигналы под референсный пик для отображения в диапазоне [-1.5, 1.5]
+    E_sig_norm = E_sig_dc / norm_factor
+    E_bg_norm = E_bg_dc / norm_factor
+    
     peak_idx = np.argmax(np.abs(E_bg_dc))
     t_peak = t_bg[peak_idx]
     
     win = np.exp(-0.5 * ((t_sig - t_peak) / current_sigma) ** 2)
-    E_sig_win = E_sig_dc * win
+    E_sig_win = E_sig_norm * win
     
     win_bg = np.exp(-0.5 * ((t_bg - t_peak) / current_sigma) ** 2)
-    E_bg_win = E_bg_dc * win_bg
+    E_bg_win = E_bg_norm * win_bg
     
-    spec_sig = np.abs(rfft(E_sig_win))
+    spec_sig = np.abs(rfft(E_sig_dc * win)) # БПФ берем от денормированных для физической точности
     dt = t_sig[1] - t_sig[0]
     freqs = rfftfreq(len(E_sig_win), d=dt)
-    spec_bg = np.abs(rfft(E_bg_win))
+    spec_bg = np.abs(rfft(E_bg_dc * win_bg))
     spec_bg_safe = np.maximum(spec_bg, 1e-10)
     trans = (spec_sig / spec_bg_safe) ** 2
     
     # 4. Строим начальные линии на ax1 (временная область)
-    line_bg, = ax1.plot(t_bg, E_bg_dc, color='crimson', linestyle='--', alpha=0.7, label='Опорный (Фон)')
-    line_sig, = ax1.plot(t_sig, E_sig_dc, color='navy', label='Образец')
-    
-    # Строим Гауссово окно на правой оси (не нормируя под сигнал)
-    line_win, = ax1_twin.plot(t_sig, win, color='orange', linestyle=':', linewidth=2, label='Окно Гаусса')
+    line_bg, = ax1.plot(t_bg, E_bg_win, color='crimson', linestyle='--', alpha=0.7, label='Опорный (окно)')
+    line_sig, = ax1.plot(t_sig, E_sig_win, color='navy', label='Образец (окно)')
+    line_win, = ax1.plot(t_sig, win, color='orange', linestyle=':', linewidth=2, label='Окно Гаусса')
     
     ax1.set_xlabel('Время задержки (пс)')
     ax1.set_ylabel('Амплитуда поля E (у.е.)')
     ax1.set_title(f'Временной ТГц-импульс (Угол {current_angle}°, Повторение {current_rep})')
     ax1.grid(True, linestyle=':', alpha=0.6)
     
-    # Настройка лимитов осей
-    ax1.set_ylim(-max_amp_global * 1.15, max_amp_global * 1.15)
-    ax1_twin.set_ylim(-0.05, 1.05)
-    ax1_twin.set_ylabel('Амплитуда окна (0 - 1)', color='orange')
-    ax1_twin.tick_params(axis='y', labelcolor='orange')
-    
-    # Объединяем легенды с двух осей
-    lines = [line_bg, line_sig, line_win]
-    labels = [l.get_label() for l in lines]
-    ax1.legend(lines, labels, loc='upper right', fontsize=9)
+    # Задаем фиксированный диапазон по оси Y вручную от -1.5 до 1.5
+    ax1.set_ylim(-1.5, 1.5)
+    ax1.legend(loc='upper right', fontsize=9)
     
     # 5. Строим начальные линии на ax2 (частотная область)
     mask = (freqs >= config.F_MIN) & (freqs <= config.F_MAX)
@@ -143,35 +130,39 @@ def main_interactive():
         
         E_s_dc = E_s - np.mean(E_s)
         E_b_dc = E_b - np.mean(E_b)
+        n_factor = np.max(np.abs(E_b_dc))
+        
+        E_s_norm = E_s_dc / n_factor
+        E_b_norm = E_b_dc / n_factor
+        
         p_idx = np.argmax(np.abs(E_b_dc))
         t_p = t_b[p_idx]
         
         w = np.exp(-0.5 * ((t_s - t_p) / current_sigma) ** 2)
-        E_s_win = E_s_dc * w
+        E_s_win = E_s_norm * w
         
         w_b = np.exp(-0.5 * ((t_b - t_p) / current_sigma) ** 2)
-        E_b_win = E_b_dc * w_b
+        E_b_win = E_b_norm * w_b
         
-        spec_s = np.abs(rfft(E_s_win))
+        # Расчет БПФ от исходных (денормированных) сигналов для точности
+        spec_s = np.abs(rfft(E_s_dc * w))
         d_t = t_s[1] - t_s[0]
         fr = rfftfreq(len(E_s_win), d=d_t)
-        spec_b = np.abs(rfft(E_b_win))
+        spec_b = np.abs(rfft(E_b_dc * w_b))
         spec_b_s = np.maximum(spec_b, 1e-10)
         tr = (spec_s / spec_b_s) ** 2
         
         # Обновляем графики временного импульса
         line_bg.set_xdata(t_b)
-        line_bg.set_ydata(E_b_dc)
+        line_bg.set_ydata(E_b_win)
         line_sig.set_xdata(t_s)
-        line_sig.set_ydata(E_s_dc)
-        
-        # Обновляем Гауссово окно на правой оси Y
+        line_sig.set_ydata(E_s_win)
         line_win.set_xdata(t_s)
         line_win.set_ydata(w)
         
         ax1.set_title(f'Временной ТГц-импульс (Угол {current_angle}°, Повторение {current_rep})')
         ax1.relim()
-        # Отключаем автоскейл по оси Y, чтобы масштаб оставался постоянным при кликах
+        # Отключаем автоскейл по оси Y, чтобы масштаб оставался строго [-1.5, 1.5]
         ax1.autoscale_view(scalex=True, scaley=False)
         
         # Обновляем графики спектров пропускания
