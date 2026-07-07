@@ -106,11 +106,21 @@ def compute_t_perp(p_over_lambda: float, d_over_p: float, N: int = 15) -> comple
     """
     fa = compute_fa(p_over_lambda, d_over_p, N)
     fb = compute_fb(p_over_lambda, d_over_p, N)
-    Z1, Z2 = 1j * fa, 1j * fb
-    denom1, denom2 = 1.0 + Z1, 1.0 + Z2
-    if abs(denom1) < EPS or abs(denom2) < EPS:
-        return 0.0
-    return 1.0 / denom1 - 1.0 / denom2
+    
+    Za = -1j / fa if abs(fa) > EPS else -1e9j
+    Zb = -1j / fb if abs(fb) > EPS else -1e9j
+    
+    # Z1/Z0 (ур. 4) и Z2/Z0 (ур. 5)
+    num1 = Za**2 + Za*Zb + (Za**2)*Zb
+    den1 = 2.0*Za + Za**2 + Zb + Za*Zb
+    Z1 = num1 / den1 if abs(den1) > EPS else 0j
+    
+    Z2 = Za / (1.0 + Za) if abs(1.0 + Za) > EPS else 1.0 + 0j
+    
+    # T_perp (ур. 3)
+    num_t = 2.0 * Z1 * Z2
+    den_t = (1.0 + Z1) * (Zb + Z2)
+    return num_t / den_t if abs(den_t) > EPS else 0j
 
 
 def compute_t_par(p_over_lambda: float, d_over_p: float, N: int = 15) -> complex:
@@ -119,11 +129,22 @@ def compute_t_par(p_over_lambda: float, d_over_p: float, N: int = 15) -> complex
     """
     fc = compute_fc(p_over_lambda, d_over_p, N)
     fd = compute_fd(p_over_lambda, d_over_p)
-    Z3, Z4 = 1j * fc, 1j * fd
-    denom1, denom2 = 1.0 + Z3, 1.0 + Z3 * Z4 + Z3 + Z4
-    if abs(denom1) < EPS or abs(denom2) < EPS:
+    
+    Zc = 1j * fc
+    Zd = -1j * fd
+    
+    # Z3/Z0 (ур. 14) и Z4/Z0 (ур. 15)
+    den34 = 1.0 + Zc + Zd
+    if abs(den34) < EPS:
         return 0.0
-    return 2.0 * Z3 * Z4 / denom2
+        
+    Z3 = (Zd + 2.0*Zc*Zd + Zd**2 + Zc) / den34
+    Z4 = (Zc + Zc*Zd) / den34
+    
+    # T_par (ур. 13)
+    num_t = 2.0 * Z3 * Z4
+    den_t = (1.0 + Z3) * (Zd + Z4) * (1.0 + Zd)
+    return num_t / den_t if abs(den_t) > EPS else 0j
 
 
 def transmission_two_polarizers(theta: float, p_over_lambda: float, d_over_p: float, N: int = 15) -> float:
