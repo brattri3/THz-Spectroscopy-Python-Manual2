@@ -69,6 +69,7 @@ def update(val):
     
     E_s_dc = E_s - np.mean(E_s)
     E_b_dc = E_b - np.mean(E_b)
+    
     p_idx = np.argmax(np.abs(E_b_dc))
     t_p = t_b[p_idx]
     
@@ -86,18 +87,16 @@ def update(val):
     tr = (spec_s / spec_b_s) ** 2
     
     # Обновляем графики временного импульса
-    line_raw.set_xdata(t_s)
-    line_raw.set_ydata(E_s_dc)
+    line_bg.set_xdata(t_b)
+    line_bg.set_ydata(E_b_win)
+    line_sig.set_xdata(t_s)
+    line_sig.set_ydata(E_s_win)
     line_win.set_xdata(t_s)
-    line_win.set_ydata(E_s_win)
-    
-    max_amp_new = np.max(np.abs(E_s_dc))
-    line_envelope_pos.set_ydata(w * max_amp_new)
-    line_envelope_neg.set_ydata(-w * max_amp_new)
+    line_win.set_ydata(w)
     
     ax1.set_title(f'Временной ТГц-импульс (Угол {current_angle}°, Повторение {current_rep})')
     ax1.relim()
-    ax1.autoscale_view(scalex=False, scaley=True)
+    ax1.autoscale_view(scalex=True, scaley=False)
     
     # Обновляем графики спектров пропускания
     mask_new = (fr >= config.F_MIN) & (fr <= config.F_MAX)
@@ -119,12 +118,12 @@ def update(val):
 \begin{syntaxdesc}
     \item[Создание переключателей \mycode{RadioButtons(ax_radio_angle, ...)}] Инициализирует виджет переключения углов и повторных измерений в выделенных осях интерфейса.
     \item[Создание слайдера \mycode{Slider(ax_slider_sigma, ...)}] Настраивает слайдер с диапазоном $[5.0, 300.0]$ пс для регулировки ширины окна.
-    \item[Локальное обновление \mycode{line_raw.set_ydata(E_s_dc)}] Метод быстро обновляет отсчеты по оси ординат для сырого сигнала, исключая необходимость полной перерисовки координатной сетки.
-    \item[Обновление огибающей \mycode{line_envelope_pos.set_ydata(w * max_amp_new)}] Корректирует форму отображаемого Гауссова окна с учетом изменения его ширины на слайдере.
-    \item[Запрос перерисовки \mycode{fig.canvas.draw_idle()}] Метод сообщает графическому бэкенду о необходимости плавной смены кадра при следующем удобном цикле отрисовщика.
+    \item[Локальное обновление \mycode{line_sig.set_ydata(E_s_win)}] Быстро обновляет значения по оси ординат для заокненного сигнала образца, исключая мерцание.
+    \item[Обновление огибающей \mycode{line_win.set_ydata(w)}] Корректирует форму Гауссова окна на графике в реальном времени.
+    \item[Запрос перерисовки \mycode{fig.canvas.draw_idle()}] Сообщает бэкенду о необходимости плавной перерисовки холста при следующем удобном цикле.
 \end{syntaxdesc}
 
-\note{Методы \texttt{ax.relim()} и \texttt{ax.autoscale\_view()} заставляют Matplotlib автоматически пересчитать новые границы графиков под изменившийся сигнал, но делают это выборочно --- мы отключили автомасштабирование по оси X (\texttt{scalex=False}), чтобы временная шкала и диапазон частот оставались стабильными, а масштабировалась только амплитуда.}
+\note{Методы \texttt{ax.relim()} и \texttt{ax.autoscale\_view()} заставляют Matplotlib автоматически пересчитать новые границы графиков при смене данных. Мы разрешили автомасштабирование по оси X (\texttt{scalex=True}), но заблокировали его по оси Y (\texttt{scaley=False}) для временной области, так как диапазон Y жестко зафиксирован нами вручную от -1.5 до 1.5.}
 
 Внешний вид нашей интерактивной двухпанельной панели представлен на \figref{fig:6_1}.
 
