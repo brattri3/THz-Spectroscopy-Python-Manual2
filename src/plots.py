@@ -199,7 +199,7 @@ def main_interactive():
         
     def on_angle_changed(label):
         nonlocal current_angle
-        current_angle = int(label.replace("Угол ", "").replace("°", ""))
+        current_angle = float(label.replace("Угол ", "").replace("°", ""))
         update(None)
         
     def on_rep_changed(label):
