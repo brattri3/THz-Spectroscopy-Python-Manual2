@@ -6,37 +6,6 @@ import config
 import data_loader
 import spectrum
 
-def plot_time_signals(t_bg, E_bg, t_sig, E_sig):
-    """
-    Строит графики опорного сигнала (фона) и сигнала образца во временной области.
-    """
-    plt.figure(figsize=(9, 4.5))
-    
-    # Опорный сигнал (Фон)
-    plt.plot(
-        t_bg, E_bg, 
-        color='crimson', 
-        linestyle='--', 
-        label='Опорный сигнал (Фон)', 
-        alpha=0.8
-    )
-    
-    # Сигнал образца
-    plt.plot(
-        t_sig, E_sig, 
-        color='navy', 
-        label='Сигнал образца', 
-        alpha=0.9
-    )
-    
-    plt.xlabel('Время задержки (пс)')
-    plt.ylabel('Амплитуда поля E (у.е.)')
-    plt.title('Сравнение ТГц импульсов: воздух vs образец')
-    plt.grid(True, linestyle=':')
-    plt.legend()
-    plt.show()
-
-
 def main_interactive():
     # Проверяем наличие файлов в директории данных
     path = Path(config.DATA_DIR)
@@ -61,6 +30,13 @@ def main_interactive():
         print("Ошибка: необработанные данные не найдены в базе!")
         return
     
+    # Находим максимальную амплитуду среди всех сигналов базы данных для фиксации оси Y
+    max_amp_global = 0.0
+    for k, val in data_store.items():
+        if k[0] in ('signal_raw', 'bg_raw'):
+            t_val, E_val = val
+            max_amp_global = max(max_amp_global, np.max(np.abs(E_val - np.mean(E_val))))
+    
     # Начальное интерактивное состояние
     current_angle = angles1[0]
     current_rep = reps[0]
@@ -69,6 +45,9 @@ def main_interactive():
     # 3. Подготавливаем фигуру и сетку графиков (Plot Grid)
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11, 8))
     plt.subplots_adjust(left=0.25, bottom=0.15, hspace=0.35)
+    
+    # Создаем вторую ось Y для отображения ненормированного окна от 0 до 1
+    ax1_twin = ax1.twinx()
     
     # Вспомогательный метод для получения ключей по углу первого поляризатора и повторению
     def get_keys(angle, rep):
@@ -107,17 +86,27 @@ def main_interactive():
     trans = (spec_sig / spec_bg_safe) ** 2
     
     # 4. Строим начальные линии на ax1 (временная область)
-    line_raw, = ax1.plot(t_sig, E_sig_dc, color='gray', alpha=0.5, label='Исходный сигнал (без DC)')
-    line_win, = ax1.plot(t_sig, E_sig_win, color='royalblue', linewidth=1.5, label='Сигнал после окна')
-    max_amp = np.max(np.abs(E_sig_dc))
-    line_envelope_pos, = ax1.plot(t_sig, win * max_amp, 'r--', alpha=0.7, label='Огибающая окна')
-    line_envelope_neg, = ax1.plot(t_sig, -win * max_amp, 'r--', alpha=0.7)
+    line_bg, = ax1.plot(t_bg, E_bg_dc, color='crimson', linestyle='--', alpha=0.7, label='Опорный (Фон)')
+    line_sig, = ax1.plot(t_sig, E_sig_dc, color='navy', label='Образец')
+    
+    # Строим Гауссово окно на правой оси (не нормируя под сигнал)
+    line_win, = ax1_twin.plot(t_sig, win, color='orange', linestyle=':', linewidth=2, label='Окно Гаусса')
     
     ax1.set_xlabel('Время задержки (пс)')
     ax1.set_ylabel('Амплитуда поля E (у.е.)')
     ax1.set_title(f'Временной ТГц-импульс (Угол {current_angle}°, Повторение {current_rep})')
     ax1.grid(True, linestyle=':', alpha=0.6)
-    ax1.legend(loc='upper right', fontsize=9)
+    
+    # Настройка лимитов осей
+    ax1.set_ylim(-max_amp_global * 1.15, max_amp_global * 1.15)
+    ax1_twin.set_ylim(-0.05, 1.05)
+    ax1_twin.set_ylabel('Амплитуда окна (0 - 1)', color='orange')
+    ax1_twin.tick_params(axis='y', labelcolor='orange')
+    
+    # Объединяем легенды с двух осей
+    lines = [line_bg, line_sig, line_win]
+    labels = [l.get_label() for l in lines]
+    ax1.legend(lines, labels, loc='upper right', fontsize=9)
     
     # 5. Строим начальные линии на ax2 (частотная область)
     mask = (freqs >= config.F_MIN) & (freqs <= config.F_MAX)
@@ -171,20 +160,19 @@ def main_interactive():
         tr = (spec_s / spec_b_s) ** 2
         
         # Обновляем графики временного импульса
-        line_raw.set_xdata(t_s)
-        line_raw.set_ydata(E_s_dc)
-        line_win.set_xdata(t_s)
-        line_win.set_ydata(E_s_win)
+        line_bg.set_xdata(t_b)
+        line_bg.set_ydata(E_b_dc)
+        line_sig.set_xdata(t_s)
+        line_sig.set_ydata(E_s_dc)
         
-        max_amp_new = np.max(np.abs(E_s_dc))
-        line_envelope_pos.set_xdata(t_s)
-        line_envelope_pos.set_ydata(w * max_amp_new)
-        line_envelope_neg.set_xdata(t_s)
-        line_envelope_neg.set_ydata(-w * max_amp_new)
+        # Обновляем Гауссово окно на правой оси Y
+        line_win.set_xdata(t_s)
+        line_win.set_ydata(w)
         
         ax1.set_title(f'Временной ТГц-импульс (Угол {current_angle}°, Повторение {current_rep})')
         ax1.relim()
-        ax1.autoscale_view(scalex=False, scaley=True)
+        # Отключаем автоскейл по оси Y, чтобы масштаб оставался постоянным при кликах
+        ax1.autoscale_view(scalex=True, scaley=False)
         
         # Обновляем графики спектров пропускания
         mask_new = (fr >= config.F_MIN) & (fr <= config.F_MAX)
@@ -212,7 +200,6 @@ def main_interactive():
     slider_sigma.on_changed(update)
     
     plt.show()
-
 
 def plot_all_transmissions():
     # Загружаем данные и вычисляем спектры для всех углов
@@ -244,7 +231,6 @@ def plot_all_transmissions():
     plt.legend(loc='lower left', ncol=2) # выводим легенду в две колонки
     plt.tight_layout()
     plt.show()
-
 
 def plot_polarizer_theory_characteristics(p=config.P_DEFAULT, d=config.D_DEFAULT):
     """
@@ -288,7 +274,6 @@ def plot_polarizer_theory_characteristics(p=config.P_DEFAULT, d=config.D_DEFAULT
     plt.legend(loc='center left')
     plt.tight_layout()
     plt.show()
-
 
 if __name__ == '__main__':
     import sys
