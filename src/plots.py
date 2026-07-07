@@ -1,4 +1,13 @@
 import numpy as np
+import matplotlib
+# Автоматический выбор интерактивного бэкенда при запуске
+if matplotlib.get_backend().lower() in ('agg', 'module://matplotlib_inline.backend_inline', 'inline'):
+    for backend in ['TkAgg', 'Qt5Agg', 'QtAgg', 'WXAgg']:
+        try:
+            matplotlib.use(backend)
+            break
+        except Exception:
+            continue
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RadioButtons
 from pathlib import Path
