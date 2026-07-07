@@ -291,21 +291,27 @@ def plot_polarizer_theory_characteristics(p=config.P_DEFAULT, d=config.D_DEFAULT
 
 
 if __name__ == '__main__':
-    # Переключим бэкенд на неинтерактивный для автономного теста при компиляции/линте
-    import matplotlib
-    matplotlib.use('Agg')
-    
-    print("Запуск тестирования plots.py...")
+    import sys
+    # Настроим неинтерактивный бэкенд только если запущен тест
+    if '--test' in sys.argv or 'test' in sys.argv:
+        import matplotlib
+        matplotlib.use('Agg')
+        
+    print("Запуск тестирования/работы plots.py...")
     path = Path(config.DATA_DIR)
     if not path.exists() or not list(path.glob("*.txt")):
-        print("Ошибка: Тестовые данные отсутствуют. Пропуск тестирования.")
+        print("Ошибка: Тестовые данные отсутствуют. Проверьте путь в config.py.")
     else:
-        data_store = data_loader.load_dataset_to_store(config.DATA_DIR)
-        data_store = spectrum.process_dataset(data_store)
-        print("  - Загружено ключей в базу:", len(data_store))
-        print("  - Спектральные ключи:", sorted([k for k in data_store.keys() if k[0] == 'spec_avg']))
-        
-        # Проверяем работу новой теоретической функции
-        print("  - Расчет теоретических спектров...")
-        plot_polarizer_theory_characteristics()
-    print("Тестирование завершено успешно.")
+        if '--test' in sys.argv or 'test' in sys.argv:
+            data_store = data_loader.load_dataset_to_store(config.DATA_DIR)
+            data_store = spectrum.process_dataset(data_store)
+            print("  - Загружено ключей в базу:", len(data_store))
+            print("  - Спектральные ключи:", sorted([k for k in data_store.keys() if k[0] == 'spec_avg']))
+            
+            # Проверяем работу теоретической функции
+            print("  - Расчет теоретических спектров...")
+            plot_polarizer_theory_characteristics()
+            print("Тестирование завершено успешно.")
+        else:
+            # Запускаем основное интерактивное окно
+            main_interactive()
