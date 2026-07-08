@@ -2,7 +2,6 @@ node_modules/
 build/
 dist/
 coverage/
-/images/
 .DS_Store
 *.log
 .env*
@@ -47,6 +46,7 @@ _minted-main/
 # Разрешаем загрузку только папки /text/, рабочей папки /src/, конфигураций и документации
 !/text/
 !/src/
+!/images/
 !AGENTS.md
 !README.md
 !PLANNER.md
