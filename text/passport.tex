@@ -65,7 +65,7 @@
 		\\ {\tiny Grid structure photo (period $15.93 \pm 5.03$ $\mu$m)}
 	\end{minipage}
 	
-	\vspace{0.4em}
+	\vspace{0.5em}
 	
 	\noindent\textbf{2. Technical and Calibration Specifications}
 	\begin{table}[H]
@@ -80,16 +80,16 @@
 			Measured geometric period $P_{\text{geom}}$ (via photo) & $15.93 \pm 5.03$~$\mu$m ($\pm 31.6\%$, quality class "A") \\
 			Calibration frequency range & 0.05 -- 2.0 THz \\
 			\midrule
-			\textbf{Blanco model effective parameters [1]} & \textbf{For calibration curve calculations (95\% CI):} \\
+			\textbf{Blanco model effective parameters\textsuperscript{*}} & \textbf{For calibration curve calculations (95\% CI):} \\
 			Effective grid period $P_{\text{eff}}$ & $15.50 \pm 0.05$~$\mu$m \\
-			Effective strip width $D_{\text{eff}}$\footnotemark & $5.66 \pm 0.24$~$\mu$m \\
+			Effective strip width $D_{\text{eff}}$\textsuperscript{*} & $5.66 \pm 0.24$~$\mu$m \\
 			Ohmic loss factor $loss\_factor$ & $0.1345 \pm 0.0080$ dB/THz \\
 			Systematic angular offset $\theta_{\text{offset}}$ & $-0.45^\circ \pm 0.08^\circ$ (rotator backlash compensation) \\
 			Model approximation error (RMSE) & $\pm 1.4$ dB (dynamic range up to $-45$ dB) \\
 			\bottomrule
 		\end{tabularx}
 	\end{table}
-	\footnotetext{The Blanco model [1] maps a cylindrical wire grid to an equivalent flat strip grid. Electrodynamically, a round wire of nominal diameter $D = 11.0$~$\mu$m interacts with THz radiation similarly to a flat metal strip of width $d \approx D/2$, resulting in a smaller effective electrodynamic width $D_{\text{eff}} \approx 5.66$~$\mu$m.}
+	\footnotetext[*]{The Blanco model maps a cylindrical wire grid to an equivalent flat strip grid. Electrodynamically, a round wire of nominal diameter $D = 11.0$~$\mu$m interacts with THz radiation similarly to a flat metal strip of width $d \approx D/2$, resulting in a smaller effective width $D_{\text{eff}} \approx 5.66$~$\mu$m. See: A. Blanco, S. Fonti, and A. Piacente, "Transmission coefficients of free-standing wire grids in the far infrared: A theoretical approach for easy computation," \textit{Int. J. Infrared Millim. Waves}, vol. 7, no. 11, pp. 1711–1722, Nov. 1986.}
 	
 	\vspace{-0.3em}
 	
@@ -104,10 +104,6 @@
 		\label{fig:scheme}
 	\end{figure}
 	
-	\vspace{-1.0em}
-	\noindent\vfill
-	\noindent\scriptsize{\textbf{References:} [1] A. Blanco, S. Fonti, and A. Piacente, "Transmission coefficients of free-standing wire grids in the far infrared: A theoretical approach for easy computation," \textit{Int. J. Infrared Millim. Waves}, vol. 7, no. 11, pp. 1711–1722, Nov. 1986.}
-	
 	\newpage
 	
 	% ==========================================
@@ -120,15 +116,15 @@
 	\vspace{0.2em}
 	
 	\noindent\textbf{4. Attenuator Application Scenarios} \\
-	Depending on the receiver type, the introduced power transmission $T(\theta, \nu)$ at frequency $\nu$ is calculated according to the electrodynamic Blanco model [1] using one of the following scenarios:
+	Depending on the receiver type, the introduced power transmission $T(\theta, \nu)$ at frequency $\nu$ is calculated according to the electrodynamic Blanco model\textsuperscript{*} using one of the following scenarios:
 	\begin{enumerate}[leftmargin=0.8cm, label=\Alph*., itemsep=1pt]
 		\item \textbf{Scenario A (Bolometer / Golay Cell) --- polarization-insensitive detector}: Registers the total transmitted power:
 		$T(\theta, \nu) = |t_{\perp}(\nu)|^2 \cos^2(\theta - \theta_{\text{offset}}) + |t_{\parallel}(\nu)|^2 \sin^2(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$, 
-		where $|t_{\perp}(\nu)|^2$ and $|t_{\parallel}(\nu)|^2$ are the power transmission coefficients of the grids for perpendicular and parallel polarizations, respectively, calculated via the Blanco model [1].
+		where $|t_{\perp}(\nu)|^2$ and $|t_{\parallel}(\nu)|^2$ are the power transmission coefficients of the grids for perpendicular and parallel polarizations, respectively, calculated via the Blanco model\textsuperscript{*}.
 		
 		\item \textbf{Scenario B (PCA Menlo Tera K8) --- polarization-sensitive detector}: The detector registers only the horizontal component of the electric field:
 		$T(\theta, \nu) = \left| t_{\perp}(\nu) \cos^2(\theta - \theta_{\text{offset}}) + t_{\parallel}(\nu) \sin^2(\theta - \theta_{\text{offset}}) \right|^2 + T_{\text{noise}}$, 
-		where $t_{\perp}(\nu)$ and $t_{\parallel}(\nu)$ are the complex amplitude transmission coefficients calculated via the Blanco model [1].
+		where $t_{\perp}(\nu)$ and $t_{\parallel}(\nu)$ are the complex amplitude transmission coefficients calculated via the Blanco model\textsuperscript{*}.
 	\end{enumerate}
 	
 	\vspace{0.2em}
