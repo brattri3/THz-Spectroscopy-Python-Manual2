@@ -60,9 +60,9 @@ def simulate_T(angle_deg, freq_th, scenario='B'):
 def generate_plots():
     print("=== GENERATING PASSPORT PLOTS (ENGLISH, MONOCHROME-COMPATIBLE COLOR) ===")
     
-    # 1. Загрузка экспериментальных точек
+    # 1. Загрузка экспериментальных точек (используем чистую серию Repetition 1)
     try:
-        angles_exp, freqs_exp, exp_linear, exp_db, t_noise = fitting_2d.load_2d_experimental_data(repetition=2, freq_start=0.2, freq_end=1.5)
+        angles_exp, freqs_exp, exp_linear, exp_db, t_noise = fitting_2d.load_2d_experimental_data(repetition=1, freq_start=0.2, freq_end=1.5)
         idx_05 = np.argmin(np.abs(freqs_exp - 0.5))
         idx_10 = np.argmin(np.abs(freqs_exp - 1.0))
         
