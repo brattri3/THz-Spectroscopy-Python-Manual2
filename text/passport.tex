@@ -103,16 +103,35 @@
 	
 	\vspace{-0.5em}
 	
-	\noindent\textbf{3. Experimental Setup and Methodology} \\
-	The calibration of the attenuator was performed on a Menlo Tera K8 time-domain terahertz spectrometer (THz-TDS). The incident radiation possessed horizontal linear polarization. The experimental transmission scheme is shown in Figure 1.
-	
-	\begin{figure}[H]
+	\noindent
+	\begin{minipage}[t]{0.52\textwidth}
+		\vspace{0pt}
+		\noindent\textbf{3. Experimental Setup and Methodology} \\
+		The calibration of the attenuator was performed on a Menlo Tera K8 time-domain terahertz spectrometer (THz-TDS). The incident radiation possessed horizontal linear polarization. The experimental transmission scheme is shown in Figure 1.
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.44\textwidth}
+		\vspace{0pt}
 		\centering
-		\includegraphics[width=0.36\textwidth]{fig0_1}
-		\vspace{-0.5em}
-		\caption{Experimental setup scheme for attenuator calibration with polarizer angle $\theta_1$ and analyzer angle $\theta_2$.}
+		\includegraphics[width=\textwidth]{fig0_1}
+		\vspace{-0.6em}
+		\captionof{figure}{Experimental setup scheme with angles $\theta_1$ and $\theta_2$.}
 		\label{fig:scheme}
-	\end{figure}
+	\end{minipage}
+	
+	\vspace{0.4em}
+	
+	\noindent\textbf{4. Attenuator Application Scenarios} \\
+	Depending on the receiver type, the introduced power transmission $T(\theta, \nu)$ at frequency $\nu$ is calculated according to the electrodynamic Blanco model\textsuperscript{*} using one of the following scenarios:
+	\begin{enumerate}[leftmargin=0.8cm, label=\Alph*., itemsep=1pt, parsep=0pt]
+		\item \textbf{Scenario A (Bolometer / Golay Cell) --- polarization-insensitive detector}: Registers the total transmitted power: \\
+		$T(\theta, \nu) = |t_{\perp}(\nu)|^2 \cos^2(\theta - \theta_{\text{offset}}) + |t_{\parallel}(\nu)|^2 \sin^2(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$, 
+		where $|t_{\perp}(\nu)|^2$ and $|t_{\parallel}(\nu)|^2$ are the power transmission coefficients of the grids for perpendicular and parallel polarizations, respectively, calculated via the Blanco model\textsuperscript{*}.
+		
+		\item \textbf{Scenario B (PCA Menlo Tera K8) --- polarization-sensitive detector}: The detector registers only the horizontal component of the electric field: \\
+		$T(\theta, \nu) = \left| t_{\perp}(\nu) \cos^2(\theta - \theta_{\text{offset}}) + t_{\parallel}(\nu) \sin^2(\theta - \theta_{\text{offset}}) \right|^2 + T_{\text{noise}}$, 
+		where $t_{\perp}(\nu)$ and $t_{\parallel}(\nu)$ are the complex amplitude transmission coefficients calculated via the Blanco model\textsuperscript{*}.
+	\end{enumerate}
 	
 	\newpage
 	
@@ -125,48 +144,41 @@
 	
 	\vspace{0.2em}
 	
-	\noindent\textbf{4. Attenuator Application Scenarios} \\
-	Depending on the receiver type, the introduced power transmission $T(\theta, \nu)$ at frequency $\nu$ is calculated according to the electrodynamic Blanco model\textsuperscript{*} using one of the following scenarios:
-	\begin{enumerate}[leftmargin=0.8cm, label=\Alph*., itemsep=1pt]
-		\item \textbf{Scenario A (Bolometer / Golay Cell) --- polarization-insensitive detector}: Registers the total transmitted power:
-		$T(\theta, \nu) = |t_{\perp}(\nu)|^2 \cos^2(\theta - \theta_{\text{offset}}) + |t_{\parallel}(\nu)|^2 \sin^2(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$, 
-		where $|t_{\perp}(\nu)|^2$ and $|t_{\parallel}(\nu)|^2$ are the power transmission coefficients of the grids for perpendicular and parallel polarizations, respectively, calculated via the Blanco model\textsuperscript{*}.
-		
-		\item \textbf{Scenario B (PCA Menlo Tera K8) --- polarization-sensitive detector}: The detector registers only the horizontal component of the electric field:
-		$T(\theta, \nu) = \left| t_{\perp}(\nu) \cos^2(\theta - \theta_{\text{offset}}) + t_{\parallel}(\nu) \sin^2(\theta - \theta_{\text{offset}}) \right|^2 + T_{\text{noise}}$, 
-		where $t_{\perp}(\nu)$ and $t_{\parallel}(\nu)$ are the complex amplitude transmission coefficients calculated via the Blanco model\textsuperscript{*}.
-	\end{enumerate}
-	
-	\vspace{0.2em}
 	\noindent\textbf{5. Calibration Transmission and Attenuation Curves} \\
-	For manual attenuation adjustment, use the graphical curves in Figure 2. To set the required attenuation $A$ (in dB), locate the target value on the vertical scale of Figure 2 (either right or left) and find the corresponding rotator angle $\theta$. The left panel shows the linear transmission scale for low attenuation ($0^\circ - 60^\circ$), while the right panel displays the decibel scale for deep attenuation ($30^\circ - 90^\circ$). The Menlo experimental data points in Figure 2 correspond to the Scenario B measurements and confirm the high accuracy of the Blanco model.
+	For manual attenuation adjustment, use the graphical curves in Figure 2. To set the required attenuation $A$ (in dB), locate the target value on the vertical scale of Figure 2 (either right or left) and find the corresponding rotator angle $\theta$. The left panel shows the linear transmission scale for low attenuation ($0^\circ - 60^\circ$), while the right panel displays the decibel scale for deep attenuation ($30^\circ - 90^\circ$). The Menlo experimental data points in Figure 2 correspond to the Scenario B measurements and confirm the high accuracy of the Blanco model\textsuperscript{*}.
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.78\textwidth]{passport_calibration}
+		\includegraphics[width=0.96\textwidth]{passport_calibration}
 		\vspace{-0.5em}
 		\caption{Calibration curves: low attenuation in linear scale (left) and deep attenuation in decibel scale (right). Right axes display alternative units.}
 		\label{fig:calib}
 	\end{figure}
 	
-	\vspace{-0.9em}
-	\noindent\textbf{6. Angular Position Error Analysis} \\
-	Due to the trigonometric nature of the Malus law, the sensitivity of the attenuation to the rotator angle error $\Delta \theta$ increases sharply at angles $\theta > 70^\circ$. Figure 3 shows the attenuation error $\Delta A$ for Scenario B under instrumental rotator backlasses of $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.
+	\vspace{-0.5em}
 	
-	\begin{figure}[H]
+	\noindent
+	\begin{minipage}[t]{0.56\textwidth}
+		\vspace{0pt}
+		\noindent\textbf{6. Angular Position Error Analysis} \\
+		Due to the trigonometric nature of the Malus law, the sensitivity of the attenuation to the rotator angle error $\Delta \theta$ increases sharply at angles $\theta > 70^\circ$. Figure 3 shows the attenuation error $\Delta A$ for Scenario B under instrumental rotator backlashes of $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.
+		
+		\vspace{0.4em}
+		\noindent\textbf{7. Calculation Software and Physical Limitations} \\
+		The delivery package includes specialized software to calculate the exact attenuation at any frequency $\nu$ for any angle $\theta$. The software is individually calibrated for the specific device (Serial No. \#02721) using the effective parameters $P_{\text{eff}}$, $D_{\text{eff}}$, and $\theta_{\text{offset}}$. The software is distributed via email. \\
+		\textit{Limitations}: At frequencies below 10 GHz ($\lambda > 3$ cm), the holder's clear aperture (85 mm) becomes comparable to the wavelength, leading to beam diffraction at the edges.
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.40\textwidth}
+		\vspace{0pt}
 		\centering
-		\includegraphics[width=0.34\textwidth]{passport_error}
-		\vspace{-0.5em}
-		\caption{Attenuation error $\Delta A$ as a function of the rotator angle under rotator backlash values of $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.}
+		\includegraphics[width=\textwidth]{passport_error}
+		\vspace{-0.6em}
+		\captionof{figure}{Attenuation error $\Delta A$ as a function of the rotator angle under backlashes $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.}
 		\label{fig:error}
-	\end{figure}
+	\end{minipage}
 	
-	\vspace{-0.9em}
-	\noindent\textbf{7. Calculation Software and Physical Limitations} \\
-	The delivery package includes specialized software to calculate the exact attenuation at any frequency $\nu$ for any angle $\theta$. The software is individually calibrated for the specific device (Serial No. \#02721) using the effective parameters $P_{\text{eff}}$, $D_{\text{eff}}$, and $\theta_{\text{offset}}$. The software is distributed via email. \\
-	\textit{Limitations}: At frequencies below 10 GHz ($\lambda > 3$ cm), the holder's clear aperture (85 mm) becomes comparable to the wavelength, leading to beam diffraction at the edges.
-	
-	\vspace{0.4em}
+	\vspace{0.6em}
 	\hrule
 	\vspace{0.4em}
 	\begin{center}
