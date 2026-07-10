@@ -25,8 +25,9 @@ plt.rcParams['legend.fontsize'] = 9
 
 # Оптимальные эффективные параметры калибровки для текущего аттенюатора ATT-11-16-CA85
 P_eff = 15.50 * 1e-6
-D_eff = 5.66 * 1e-6
-loss_factor = 0.1345
+D_eff = 5.67 * 1e-6
+loss_factor = 0.368
+loss_exponent = 1.58
 offset_deg = -0.45
 c_light = 3e8
 
@@ -42,9 +43,9 @@ def simulate_T(angle_deg, freq_th, scenario='B'):
     t_perp = theoretical.compute_t_perp(P_eff/lambda_m, D_eff/P_eff)
     t_par = theoretical.compute_t_par(P_eff/lambda_m, D_eff/P_eff)
     
-    # Омические потери
-    t_perp_eff = t_perp * np.exp(-0.5 * loss_factor * freq_th)
-    t_par_eff = t_par * np.exp(-0.5 * loss_factor * freq_th)
+    # Омические потери с учетом дисперсионного закона e^(-alpha * nu^gamma)
+    t_perp_eff = t_perp * np.exp(-0.5 * loss_factor * (freq_th ** loss_exponent))
+    t_par_eff = t_par * np.exp(-0.5 * loss_factor * (freq_th ** loss_exponent))
     
     if scenario == 'A':
         T_total = np.abs(t_perp_eff)**2 * np.cos(angle_rad)**2 + np.abs(t_par_eff)**2 * np.sin(angle_rad)**2
