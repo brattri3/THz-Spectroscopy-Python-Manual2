@@ -129,16 +129,16 @@
 	\noindent\textbf{4. Attenuator Application Scenarios} \\
 	Depending on the receiver type, the power transmission $T(\theta, \nu)$ is calculated via the Blanco model\textsuperscript{*}, where $t_{\perp}(\nu) = t_{\perp,0}(\nu) e^{-\frac{1}{2}\alpha \nu^{\gamma}}$, $t_{\parallel}(\nu) = t_{\parallel,0}(\nu) e^{-\frac{1}{2}\alpha \nu^{\gamma}}$ are loss-corrected complex amplitude transmission coefficients ($t_{\perp,0}, t_{\parallel,0}$ are pure electrodynamic Blanco coefficients, $\alpha = 0.0847$~Np/THz$^\gamma$, $\gamma = 1.58$), $\theta_{\text{offset}}$ is the systematic angular offset, and $T_{\text{noise}}$ is the noise floor:
 	\begin{itemize}[leftmargin=0.6cm, itemsep=2pt, parsep=0pt, topsep=2pt]
-		\item \textbf{Scenario A} (Bolometer / Golay Cell --- polarization-insensitive detector): \\
-		$T(\theta, \nu) = |t_{\perp}(\nu)|^2 \cos^2(\theta - \theta_{\text{offset}}) + |t_{\parallel}(\nu)|^2 \sin^2(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$
-		\item \textbf{Scenario B} (PCA Menlo Tera K8 --- polarization-sensitive detector): \\
+		\item \textbf{Scenario A} (PCA Menlo Tera K8 --- polarization-sensitive detector): \\
 		$T(\theta, \nu) = \left| t_{\perp}(\nu) \cos^2(\theta - \theta_{\text{offset}}) + t_{\parallel}(\nu) \sin^2(\theta - \theta_{\text{offset}}) \right|^2 + T_{\text{noise}}$
+		\item \textbf{Scenario B} (Bolometer / Golay Cell --- polarization-insensitive detector): \\
+		$T(\theta, \nu) = |t_{\perp}(\nu)|^2 \cos^2(\theta - \theta_{\text{offset}}) + |t_{\parallel}(\nu)|^2 \sin^2(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$
 	\end{itemize}
 	
 	\vspace{0.3em}
 	
 	\noindent\textbf{5. Calibration Transmission and Attenuation Curves} \\
-	For manual attenuation adjustment, use the graphical curves in Figure 2. To set the required attenuation $A$ (in dB), locate the target value on the vertical scale of Figure 2 (either right or left) and find the corresponding rotator angle $\theta$. The left panel shows the linear transmission scale for low attenuation ($0^\circ - 60^\circ$), while the right panel displays the decibel scale for deep attenuation ($30^\circ - 90^\circ$). The Menlo experimental data points in Figure 2 correspond to the Scenario B measurements and confirm the high accuracy of the Blanco model\textsuperscript{*}.
+	For manual attenuation adjustment, use the graphical curves in Figure 2. To set the required attenuation $A$ (in dB), locate the target value on the vertical scale of Figure 2 (either right or left) and find the corresponding rotator angle $\theta$. The left panel shows the linear transmission scale for low attenuation ($0^\circ - 60^\circ$), while the right panel displays the decibel scale for deep attenuation ($30^\circ - 90^\circ$). The Menlo experimental data points in Figure 2 correspond to the Scenario A measurements and confirm the high accuracy of the Blanco model\textsuperscript{*}.
 	
 	\begin{figure}[H]
 		\centering
@@ -154,7 +154,7 @@
 	\begin{minipage}[t]{0.56\textwidth}
 		\vspace{0pt}
 		\noindent\textbf{6. Angular Position Error Analysis} \\
-		Due to the trigonometric nature of the Malus law, the sensitivity of the attenuation to the rotator angle error $\Delta \theta$ increases sharply at angles $\theta > 70^\circ$. Figure 3 shows the attenuation error $\Delta A$ for Scenario B under instrumental rotator backlashes of $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.
+		Due to the trigonometric nature of the Malus law, the sensitivity of the attenuation to the rotator angle error $\Delta \theta$ increases sharply at angles $\theta > 70^\circ$. Figure 3 shows the attenuation error $\Delta A$ for Scenario A under instrumental rotator backlashes of $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.
 		
 		\vspace{0.4em}
 		\noindent\textbf{7. Calculation Software and Physical Limitations} \\
@@ -167,7 +167,7 @@
 		\centering
 		\includegraphics[width=\textwidth]{passport_error}
 		\vspace{-0.6em}
-		\captionof{figure}{Attenuation error $\Delta A$ as a function of the rotator angle under backlashes $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.}
+		\captionof{figure}{Attenuation error $\Delta A$ as a function of the rotator angle under backlashes $\Delta\theta = 0.5^\circ$ and $1.0^\circ$ (Scenario A).}
 		\label{fig:error}
 	\end{minipage}
 	

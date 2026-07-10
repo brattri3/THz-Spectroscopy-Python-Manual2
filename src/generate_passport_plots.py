@@ -35,8 +35,8 @@ c_light = 3e8
 noise_db = -45.0
 noise_power = 10**(noise_db/10)
 
-def simulate_T(angle_deg, freq_th, scenario='B'):
-    # scenario 'A': болометр (cos^2), 'B': ФПА (cos^4)
+def simulate_T(angle_deg, freq_th, scenario='A'):
+    # scenario 'A': PCA (cos^4), 'B': bolometer (cos^2)
     angle_rad = np.radians(angle_deg - offset_deg)
     lambda_m = c_light / (freq_th * 1e12)
     
@@ -49,9 +49,9 @@ def simulate_T(angle_deg, freq_th, scenario='B'):
     t_perp_eff = t_perp * np.exp(-0.5 * loss_factor_np * (freq_th ** loss_exponent))
     t_par_eff = t_par * np.exp(-0.5 * loss_factor_np * (freq_th ** loss_exponent))
     
-    if scenario == 'A':
+    if scenario == 'B':  # Bolometer
         T_total = np.abs(t_perp_eff)**2 * np.cos(angle_rad)**2 + np.abs(t_par_eff)**2 * np.sin(angle_rad)**2
-    else:
+    else:  # PCA (Scenario A)
         E_out = np.cos(angle_rad)**2 * t_perp_eff + np.sin(angle_rad)**2 * t_par_eff
         T_total = np.abs(E_out)**2
         
@@ -73,9 +73,9 @@ def generate_plots():
     except Exception as e:
         print(f"Menlo data load error: {e}. Using fallback simulation.")
         angles_exp = np.array([0, 10, 20, 30, 40, 50, 60, 70, 80, 90])
-        exp_y_05_lin = np.array([simulate_T(a, 0.5, 'B') * (1 + 0.02 * np.random.randn()) for a in angles_exp])
+        exp_y_05_lin = np.array([simulate_T(a, 0.5, 'A') * (1 + 0.02 * np.random.randn()) for a in angles_exp])
         exp_y_05_db = 10 * np.log10(exp_y_05_lin)
-        exp_y_10_lin = np.array([simulate_T(a, 1.0, 'B') * (1 + 0.03 * np.random.randn()) for a in angles_exp])
+        exp_y_10_lin = np.array([simulate_T(a, 1.0, 'A') * (1 + 0.03 * np.random.randn()) for a in angles_exp])
         exp_y_10_db = 10 * np.log10(exp_y_10_lin)
     
     angles_theory = np.linspace(0, 90, 500)
@@ -86,23 +86,26 @@ def generate_plots():
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
     
     # Симуляция теории
-    T_A_05 = [simulate_T(a, 0.5, 'A') for a in angles_theory]
-    T_B_05 = [simulate_T(a, 0.5, 'B') for a in angles_theory]
-    T_A_10 = [simulate_T(a, 1.0, 'A') for a in angles_theory]
-    T_B_10 = [simulate_T(a, 1.0, 'B') for a in angles_theory]
+    T_PCA_05 = [simulate_T(a, 0.5, 'A') for a in angles_theory]
+    T_Bolo_05 = [simulate_T(a, 0.5, 'B') for a in angles_theory]
+    T_PCA_10 = [simulate_T(a, 1.0, 'A') for a in angles_theory]
+    T_Bolo_10 = [simulate_T(a, 1.0, 'B') for a in angles_theory]
     
     c_05 = '#1f77b4' # Синий
     c_10 = '#ff7f0e' # Оранжевый
     
     # --- Left panel: Linear scale ---
-    ax1.plot(angles_theory, T_A_05, color=c_05, linestyle='-', linewidth=1.5, label='Scenario A (Bolometer), 0.5 THz')
-    ax1.plot(angles_theory, T_B_05, color=c_05, linestyle='--', linewidth=1.5, label='Scenario B (PCA), 0.5 THz')
-    ax1.plot(angles_theory, T_A_10, color=c_10, linestyle='-', linewidth=1.5, label='Scenario A (Bolometer), 1.0 THz')
-    ax1.plot(angles_theory, T_B_10, color=c_10, linestyle='--', linewidth=1.5, label='Scenario B (PCA), 1.0 THz')
-    
     # Экспериментальные точки Menlo
-    ax1.plot(angles_exp, exp_y_05_lin, color=c_05, marker='o', linestyle='None', markersize=6, label='Experiment Menlo, 0.5 THz')
-    ax1.plot(angles_exp, exp_y_10_lin, color=c_10, marker='s', linestyle='None', markersize=6, label='Experiment Menlo, 1.0 THz')
+    ax1.plot(angles_exp, exp_y_05_lin, color=c_05, marker='o', linestyle='None', markersize=6, label='Experiment, 0.5 THz')
+    ax1.plot(angles_exp, exp_y_10_lin, color=c_10, marker='s', linestyle='None', markersize=6, label='Experiment, 1.0 THz')
+    
+    # Scenario A (PCA) - Solid line
+    ax1.plot(angles_theory, T_PCA_05, color=c_05, linestyle='-', linewidth=1.5, label='Scenario A (PCA), 0.5 THz')
+    ax1.plot(angles_theory, T_PCA_10, color=c_10, linestyle='-', linewidth=1.5, label='Scenario A (PCA), 1.0 THz')
+    
+    # Scenario B (Bolometer) - Dashed line
+    ax1.plot(angles_theory, T_Bolo_05, color=c_05, linestyle='--', linewidth=1.5, label='Scenario B (Bolometer), 0.5 THz')
+    ax1.plot(angles_theory, T_Bolo_10, color=c_10, linestyle='--', linewidth=1.5, label='Scenario B (Bolometer), 1.0 THz')
     
     ax1.set_xlabel('Rotator Angle $\\theta$ (deg)', fontsize=10)
     ax1.set_ylabel('Power Transmission Coefficient $T$ (Linear)', fontsize=10)
@@ -129,19 +132,22 @@ def generate_plots():
     ax1_db.set_ylim(0, 1.05) # Строго те же лимиты!
     
     # --- Right panel: dB scale ---
-    A_A_05 = 10 * np.log10(T_A_05)
-    A_B_05 = 10 * np.log10(T_B_05)
-    A_A_10 = 10 * np.log10(T_A_10)
-    A_B_10 = 10 * np.log10(T_B_10)
-    
-    ax2.plot(angles_theory, A_A_05, color=c_05, linestyle='-', linewidth=1.5, label='Scenario A (Bolometer), 0.5 THz')
-    ax2.plot(angles_theory, A_B_05, color=c_05, linestyle='--', linewidth=1.5, label='Scenario B (PCA), 0.5 THz')
-    ax2.plot(angles_theory, A_A_10, color=c_10, linestyle='-', linewidth=1.5, label='Scenario A (Bolometer), 1.0 THz')
-    ax2.plot(angles_theory, A_B_10, color=c_10, linestyle='--', linewidth=1.5, label='Scenario B (PCA), 1.0 THz')
+    A_PCA_05 = 10 * np.log10(T_PCA_05)
+    A_Bolo_05 = 10 * np.log10(T_Bolo_05)
+    A_PCA_10 = 10 * np.log10(T_PCA_10)
+    A_Bolo_10 = 10 * np.log10(T_Bolo_10)
     
     # Экспериментальные точки Menlo
-    ax2.plot(angles_exp, exp_y_05_db, color=c_05, marker='o', linestyle='None', markersize=6, label='Experiment Menlo, 0.5 THz')
-    ax2.plot(angles_exp, exp_y_10_db, color=c_10, marker='s', linestyle='None', markersize=6, label='Experiment Menlo, 1.0 THz')
+    ax2.plot(angles_exp, exp_y_05_db, color=c_05, marker='o', linestyle='None', markersize=6, label='Experiment, 0.5 THz')
+    ax2.plot(angles_exp, exp_y_10_db, color=c_10, marker='s', linestyle='None', markersize=6, label='Experiment, 1.0 THz')
+    
+    # Scenario A (PCA) - Solid line
+    ax2.plot(angles_theory, A_PCA_05, color=c_05, linestyle='-', linewidth=1.5, label='Scenario A (PCA), 0.5 THz')
+    ax2.plot(angles_theory, A_PCA_10, color=c_10, linestyle='-', linewidth=1.5, label='Scenario A (PCA), 1.0 THz')
+    
+    # Scenario B (Bolometer) - Dashed line
+    ax2.plot(angles_theory, A_Bolo_05, color=c_05, linestyle='--', linewidth=1.5, label='Scenario B (Bolometer), 0.5 THz')
+    ax2.plot(angles_theory, A_Bolo_10, color=c_10, linestyle='--', linewidth=1.5, label='Scenario B (Bolometer), 1.0 THz')
     
     ax2.set_xlabel('Rotator Angle $\\theta$ (deg)', fontsize=10)
     ax2.set_ylabel('Attenuation $A$ (dB)', fontsize=10)
@@ -182,7 +188,7 @@ def generate_plots():
     angles_err = np.linspace(0, 82, 300)
     tan_vals = np.tan(np.radians(angles_err))
     
-    # Для Сценария Б (ФПА)
+    # Для Сценария А (ФПА)
     err_B_05 = (40.0 / np.log(10.0)) * tan_vals * d_theta_05
     err_B_10 = (40.0 / np.log(10.0)) * tan_vals * d_theta_10
     
@@ -201,7 +207,7 @@ def generate_plots():
     
     plt.grid(True, linestyle=':', alpha=0.5, color='gray')
     plt.legend(fontsize=9, loc='upper left')
-    plt.title('Attenuation Error vs Rotator Backlash (Scenario B)', fontsize=10, fontweight='bold')
+    plt.title('Attenuation Error vs Rotator Backlash (Scenario A)', fontsize=10, fontweight='bold')
     
     plt.savefig(os.path.join(output_dir, 'passport_error.png'), dpi=200, bbox_inches='tight')
     plt.close()
