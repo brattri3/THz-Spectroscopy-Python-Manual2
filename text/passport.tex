@@ -82,15 +82,16 @@
 			\midrule
 			\textbf{Blanco model effective parameters [1]} & \textbf{For calibration curve calculations (95\% CI):} \\
 			Effective grid period $P_{\text{eff}}$ & $15.50 \pm 0.05$~$\mu$m \\
-			Effective wire diameter $D_{\text{eff}}$ & $5.66 \pm 0.24$~$\mu$m \\
+			Effective strip width $D_{\text{eff}}$\footnotemark & $5.66 \pm 0.24$~$\mu$m \\
 			Ohmic loss factor $loss\_factor$ & $0.1345 \pm 0.0080$ dB/THz \\
 			Systematic angular offset $\theta_{\text{offset}}$ & $-0.45^\circ \pm 0.08^\circ$ (rotator backlash compensation) \\
 			Model approximation error (RMSE) & $\pm 1.4$ dB (dynamic range up to $-45$ dB) \\
 			\bottomrule
 		\end{tabularx}
 	\end{table}
+	\footnotetext{The Blanco model [1] maps a cylindrical wire grid to an equivalent flat strip grid. Electrodynamically, a round wire of nominal diameter $D = 11.0$~$\mu$m interacts with THz radiation similarly to a flat metal strip of width $d \approx D/2$, resulting in a smaller effective electrodynamic width $D_{\text{eff}} \approx 5.66$~$\mu$m.}
 	
-	\vspace{0.2em}
+	\vspace{-0.3em}
 	
 	\noindent\textbf{3. Experimental Setup and Methodology} \\
 	The calibration of the attenuator was performed on a Menlo Tera K8 time-domain terahertz spectrometer (THz-TDS). The incident radiation possessed horizontal linear polarization. The experimental transmission scheme is shown in Figure 1.
@@ -144,7 +145,7 @@
 	
 	\vspace{-0.9em}
 	\noindent\textbf{6. Angular Position Error Analysis} \\
-	Due to the trigonometric nature of the Malus law, the sensitivity of the attenuation to the rotator angle error $\Delta \theta$ increases sharply at angles $\theta > 70^\circ$. Figure 3 shows the attenuation error $\Delta A$ for Scenario B under instrumental rotator backlashes of $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.
+	Due to the trigonometric nature of the Malus law, the sensitivity of the attenuation to the rotator angle error $\Delta \theta$ increases sharply at angles $\theta > 70^\circ$. Figure 3 shows the attenuation error $\Delta A$ for Scenario B under instrumental rotator backlasses of $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.
 	
 	\begin{figure}[H]
 		\centering
