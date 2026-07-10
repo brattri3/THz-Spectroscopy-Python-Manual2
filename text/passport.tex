@@ -61,18 +61,18 @@
 	\renewcommand{\thefootnote}{*}
 	
 	\noindent
-	\begin{minipage}[t]{0.74\textwidth}
+	\begin{minipage}[t]{0.81\textwidth}
 		\vspace{0pt}
 		\noindent\textbf{1. Application and Design} \\
 		The \mycode{ATT-11-16-CA85} THz Tunable Precision Attenuator (clear aperture 85~mm) consists of two independent wire-grid polarizers. Figure 1 shows the experimental setup scheme for THz radiation transmission through grids $P_1$ and $P_2$. The first polarizer is aligned with the polarization vector of the incident beam (angle $\theta_1 = 0^\circ$), while the rotatable polarizer (analyzer) is rotated by an angle of $\theta_2 = \theta$. The introduced attenuation is controlled by varying the relative angle $\theta = \theta_2 - \theta_1$. The device is individually calibrated for the frequency range from 0.05 to 2.0 THz ($\lambda > 150$~$\mu$m).
 	\end{minipage}
 	\hfill
-	\begin{minipage}[t]{0.23\textwidth}
+	\begin{minipage}[t]{0.16\textwidth}
 		\vspace{0pt}
 		\centering
 		\includegraphics[width=\textwidth]{passport_microphoto}
-		\vspace{-0.3em}
-		\\ {\tiny Grid structure photo (period $15.93 \pm 5.03$ $\mu$m)}
+		\par\vspace{1pt}
+		{\tiny Grid structure photo\\(period $15.93 \pm 5.03$ $\mu$m)}
 	\end{minipage}
 	
 	\vspace{0.3em}
@@ -101,34 +101,18 @@
 	\end{table}
 	\footnotetext{\scriptsize The Blanco model maps a cylindrical wire grid to an equivalent flat strip grid. Electrodynamically, a round wire of nominal diameter $D = 11.0$~$\mu$m interacts with THz radiation similarly to a flat metal strip of width $d \approx D/2$, resulting in a smaller effective width $D_{\text{eff}} \approx 5.66$~$\mu$m. See: A. Blanco, S. Fonti, and A. Piacente, "Transmission coefficients of free-standing wire grids in the far infrared: A theoretical approach for easy computation," \textit{Int. J. Infrared Millim. Waves}, vol. 7, no. 11, pp. 1711–1722, Nov. 1986.}
 	
-	\vspace{-0.3em}
+	\vspace{-0.5em}
 	
-	% Two-column layout: Sections 3+4 on left, Figure 1 on right
-	\noindent
-	\begin{minipage}[t]{0.56\textwidth}
-		\vspace{0pt}
-		\noindent\textbf{3. Experimental Setup and Methodology} \\
-		The calibration of the attenuator was performed on a Menlo Tera K8 time-domain terahertz spectrometer (THz-TDS). The incident radiation possessed horizontal linear polarization. The experimental transmission scheme is shown in Figure~1.
-		
-		\vspace{0.3em}
-		\noindent\textbf{4. Attenuator Application Scenarios} \\
-		{\small Depending on the receiver type, the power transmission $T(\theta, \nu)$ is calculated via the Blanco model\textsuperscript{*}, where $t_{\perp}(\nu)$, $t_{\parallel}(\nu)$ are complex amplitude transmission coefficients, $\theta_{\text{offset}}$ is the systematic angular offset, and $T_{\text{noise}}$ is the noise floor:
-		\begin{itemize}[leftmargin=0.5cm, itemsep=0pt, parsep=0pt, topsep=1pt]
-			\item \textbf{Scenario A} (Bolometer / Golay Cell --- polarization-insensitive): \\
-			$T = |t_{\perp}|^2 \cos^2(\theta - \theta_{\text{offset}}) + |t_{\parallel}|^2 \sin^2(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$
-			\item \textbf{Scenario B} (PCA Menlo Tera K8 --- polarization-sensitive): \\
-			$T = \left| t_{\perp} \cos^2(\theta - \theta_{\text{offset}}) + t_{\parallel} \sin^2(\theta - \theta_{\text{offset}}) \right|^2 + T_{\text{noise}}$
-		\end{itemize}}
-	\end{minipage}
-	\hfill
-	\begin{minipage}[t]{0.40\textwidth}
-		\vspace{0pt}
+	\noindent\textbf{3. Experimental Setup and Methodology} \\
+	The calibration of the attenuator was performed on a Menlo Tera K8 time-domain terahertz spectrometer (THz-TDS). The incident radiation possessed horizontal linear polarization. The experimental transmission scheme is shown in Figure 1.
+	
+	\begin{figure}[H]
 		\centering
-		\includegraphics[width=\textwidth]{fig0_1}
-		\vspace{-0.6em}
-		\captionof{figure}{Experimental setup scheme with polarizer angle $\theta_1$ and analyzer angle $\theta_2$.}
+		\includegraphics[width=0.48\textwidth]{fig0_1}
+		\vspace{-0.5em}
+		\caption{Experimental setup scheme for attenuator calibration with polarizer angle $\theta_1$ and analyzer angle $\theta_2$.}
 		\label{fig:scheme}
-	\end{minipage}
+	\end{figure}
 	
 	\newpage
 	
@@ -140,6 +124,17 @@
 	\end{center}
 	
 	\vspace{0.2em}
+	
+	\noindent\textbf{4. Attenuator Application Scenarios} \\
+	Depending on the receiver type, the power transmission $T(\theta, \nu)$ is calculated via the Blanco model\textsuperscript{*}, where $t_{\perp}(\nu)$, $t_{\parallel}(\nu)$ are complex amplitude transmission coefficients, $\theta_{\text{offset}}$ is the systematic angular offset, and $T_{\text{noise}}$ is the noise floor:
+	\begin{itemize}[leftmargin=0.6cm, itemsep=2pt, parsep=0pt, topsep=2pt]
+		\item \textbf{Scenario A} (Bolometer / Golay Cell --- polarization-insensitive detector): \\
+		$T(\theta, \nu) = |t_{\perp}(\nu)|^2 \cos^2(\theta - \theta_{\text{offset}}) + |t_{\parallel}(\nu)|^2 \sin^2(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$
+		\item \textbf{Scenario B} (PCA Menlo Tera K8 --- polarization-sensitive detector): \\
+		$T(\theta, \nu) = \left| t_{\perp}(\nu) \cos^2(\theta - \theta_{\text{offset}}) + t_{\parallel}(\nu) \sin^2(\theta - \theta_{\text{offset}}) \right|^2 + T_{\text{noise}}$
+	\end{itemize}
+	
+	\vspace{0.3em}
 	
 	\noindent\textbf{5. Calibration Transmission and Attenuation Curves} \\
 	For manual attenuation adjustment, use the graphical curves in Figure 2. To set the required attenuation $A$ (in dB), locate the target value on the vertical scale of Figure 2 (either right or left) and find the corresponding rotator angle $\theta$. The left panel shows the linear transmission scale for low attenuation ($0^\circ - 60^\circ$), while the right panel displays the decibel scale for deep attenuation ($30^\circ - 90^\circ$). The Menlo experimental data points in Figure 2 correspond to the Scenario B measurements and confirm the high accuracy of the Blanco model\textsuperscript{*}.
