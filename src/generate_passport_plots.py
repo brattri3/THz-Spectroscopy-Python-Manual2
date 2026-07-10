@@ -14,11 +14,11 @@ import fitting_2d
 output_dir = r"C:\Users\pop\.\.gemini\antigravity\worktrees\THz-Spectroscopy-Python-Manual2\apply-latest-updates\text"
 os.makedirs(output_dir, exist_ok=True)
 
-# Установка шрифтов для единообразия
+# Установка шрифтов для единообразия (все надписи на графиках будут 10pt)
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['font.size'] = 10
-plt.rcParams['axes.labelsize'] = 11
-plt.rcParams['axes.titlesize'] = 11
+plt.rcParams['axes.labelsize'] = 10
+plt.rcParams['axes.titlesize'] = 10
 plt.rcParams['xtick.labelsize'] = 9
 plt.rcParams['ytick.labelsize'] = 9
 plt.rcParams['legend.fontsize'] = 9
@@ -88,9 +88,6 @@ def generate_plots():
     T_A_10 = [simulate_T(a, 1.0, 'A') for a in angles_theory]
     T_B_10 = [simulate_T(a, 1.0, 'B') for a in angles_theory]
     
-    # Цвета: Синий для 0.5 ТГц, Оранжевый для 1.0 ТГц.
-    # Стили линий: сплошная для Scenario A, штриховая для Scenario B.
-    # Маркеры: синие кружки для 0.5 ТГц, оранжевые квадраты для 1.0 ТГц.
     c_05 = '#1f77b4' # Синий
     c_10 = '#ff7f0e' # Оранжевый
     
@@ -104,27 +101,29 @@ def generate_plots():
     ax1.plot(angles_exp, exp_y_05_lin, color=c_05, marker='o', linestyle='None', markersize=6, label='Experiment Menlo, 0.5 THz')
     ax1.plot(angles_exp, exp_y_10_lin, color=c_10, marker='s', linestyle='None', markersize=6, label='Experiment Menlo, 1.0 THz')
     
-    ax1.set_xlabel('Rotator Angle $\\theta$ (deg)', fontsize=11)
-    ax1.set_ylabel('Power Transmission Coefficient $T$ (Linear)', fontsize=11)
+    ax1.set_xlabel('Rotator Angle $\\theta$ (deg)', fontsize=10)
+    ax1.set_ylabel('Power Transmission Coefficient $T$ (Linear)', fontsize=10)
     ax1.set_xlim(0, 60)
     ax1.set_ylim(0, 1.05)
     
     # Удвоенное количество отметок на левой оси X (каждые 5 градусов)
     ax1.set_xticks(np.arange(0, 61, 5))
     # Удвоенное количество отметок на левой оси Y (шаг 0.1)
-    ax1.set_yticks(np.arange(0.0, 1.05, 0.1))
+    ticks_lin_main = np.arange(0.0, 1.05, 0.1)
+    ax1.set_yticks(ticks_lin_main)
     
     ax1.grid(True, linestyle=':', alpha=0.5, color='gray')
     ax1.legend(fontsize=9, loc='lower left')
-    ax1.set_title('Low Attenuation (Linear Scale)', fontsize=11, fontweight='bold')
+    ax1.set_title('Low Attenuation (Linear Scale)', fontsize=10, fontweight='bold')
     
-    # Правая ось дБ для левого графика
+    # Правая ось дБ для левого графика - Геометрически строго сопоставлена!
     ax1_db = ax1.twinx()
-    ax1_db.set_ylabel('Attenuation $A$ (dB)', fontsize=11)
-    ticks_lin = np.arange(0.1, 1.05, 0.1)
-    ax1_db.set_yticks(10 * np.log10(ticks_lin))
-    ax1_db.set_yticklabels([f"{10*np.log10(t):.1f}" for t in ticks_lin])
-    ax1_db.set_ylim(10*np.log10(0.01), 10*np.log10(1.05))
+    ax1_db.set_ylabel('Attenuation $A$ (dB)', fontsize=10)
+    # Поставим тики правой оси на тех же высотах Y, что и левая ось
+    ticks_lin_db = np.array([0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+    ax1_db.set_yticks(ticks_lin_db)
+    ax1_db.set_yticklabels([f"{10*np.log10(t):.1f}" for t in ticks_lin_db])
+    ax1_db.set_ylim(0, 1.05) # Строго те же лимиты!
     
     # --- Right panel: dB scale ---
     A_A_05 = 10 * np.log10(T_A_05)
@@ -141,32 +140,33 @@ def generate_plots():
     ax2.plot(angles_exp, exp_y_05_db, color=c_05, marker='o', linestyle='None', markersize=6, label='Experiment Menlo, 0.5 THz')
     ax2.plot(angles_exp, exp_y_10_db, color=c_10, marker='s', linestyle='None', markersize=6, label='Experiment Menlo, 1.0 THz')
     
-    ax2.set_xlabel('Rotator Angle $\\theta$ (deg)', fontsize=11)
-    ax2.set_ylabel('Attenuation $A$ (dB)', fontsize=11)
+    ax2.set_xlabel('Rotator Angle $\\theta$ (deg)', fontsize=10)
+    ax2.set_ylabel('Attenuation $A$ (dB)', fontsize=10)
     ax2.set_xlim(30, 90)
     ax2.set_ylim(-48, 0.5)
     
     # Удвоенное количество отметок на правой оси X (каждые 5 градусов)
     ax2.set_xticks(np.arange(30, 91, 5))
     # Удвоенное количество отметок на правой оси Y (шаг 5 дБ)
-    ax2.set_yticks(np.arange(-45, 1, 5))
+    ticks_db_main = np.arange(-45, 1, 5)
+    ax2.set_yticks(ticks_db_main)
     
     ax2.grid(True, linestyle=':', alpha=0.5, color='gray')
     ax2.legend(fontsize=9, loc='lower left')
-    ax2.set_title('Deep Attenuation (Decibel Scale)', fontsize=11, fontweight='bold')
+    ax2.set_title('Deep Attenuation (Decibel Scale)', fontsize=10, fontweight='bold')
     
-    # Правая ось в процентах для правого графика
+    # Правая ось в процентах для правого графика - Геометрически строго сопоставлена!
     ax2_lin = ax2.twinx()
-    ax2_lin.set_ylabel('Transmission $T$ (Percent)', fontsize=11)
-    ticks_db = np.arange(-45, 1, 5)
-    ax2_lin.set_yticks(ticks_db)
-    ax2_lin.set_yticklabels([f"{10**(db/10)*100:.3f}%" if db < -20 else f"{10**(db/10)*100:.1f}%" for db in ticks_db])
-    ax2_lin.set_ylim(-48, 0.5)
+    ax2_lin.set_ylabel('Transmission $T$ (Percent)', fontsize=10)
+    # Поставим тики правой оси на тех же высотах Y, что и левая ось
+    ax2_lin.set_yticks(ticks_db_main)
+    ax2_lin.set_yticklabels([f"{10**(db/10)*100:.3f}%" if db < -20 else f"{10**(db/10)*100:.1f}%" for db in ticks_db_main])
+    ax2_lin.set_ylim(-48, 0.5) # Строго те же лимиты!
     
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, 'passport_calibration.png'), dpi=200, bbox_inches='tight')
     plt.close()
-    print("Graph 1 (passport_calibration.png) successfully created.")
+    print("Graph 1 (passport_calibration.png) successfully created with aligned scales.")
     
     # =========================================================================
     # PLOT 2: Attenuation Error \Delta A (dB) vs Rotator Angle
@@ -186,8 +186,8 @@ def generate_plots():
     plt.plot(angles_err, err_B_05, color=c_05, linestyle='-', linewidth=2, label='Limber Play $\\Delta\\theta = 0.5^\\circ$')
     plt.plot(angles_err, err_B_10, color=c_10, linestyle='--', linewidth=2, label='Limber Play $\\Delta\\theta = 1.0^\\circ$')
     
-    plt.xlabel('Rotator Angle $\\theta$ (deg)', fontsize=11)
-    plt.ylabel('Attenuation Error $\\Delta A$ (dB)', fontsize=11)
+    plt.xlabel('Rotator Angle $\\theta$ (deg)', fontsize=10)
+    plt.ylabel('Attenuation Error $\\Delta A$ (dB)', fontsize=10)
     plt.xlim(0, 82)
     plt.ylim(0, 3.0)
     
@@ -198,7 +198,7 @@ def generate_plots():
     
     plt.grid(True, linestyle=':', alpha=0.5, color='gray')
     plt.legend(fontsize=9, loc='upper left')
-    plt.title('Attenuation Error vs Rotator Backlash (Scenario B)', fontsize=11, fontweight='bold')
+    plt.title('Attenuation Error vs Rotator Backlash (Scenario B)', fontsize=10, fontweight='bold')
     
     plt.savefig(os.path.join(output_dir, 'passport_error.png'), dpi=200, bbox_inches='tight')
     plt.close()
