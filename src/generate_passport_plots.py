@@ -44,8 +44,10 @@ def simulate_T(angle_deg, freq_th, scenario='B'):
     t_par = theoretical.compute_t_par(P_eff/lambda_m, D_eff/P_eff)
     
     # Омические потери с учетом дисперсионного закона e^(-alpha * nu^gamma)
-    t_perp_eff = t_perp * np.exp(-0.5 * loss_factor * (freq_th ** loss_exponent))
-    t_par_eff = t_par * np.exp(-0.5 * loss_factor * (freq_th ** loss_exponent))
+    # loss_factor задан в дБ/ТГц^gamma, переводим в Неперы (делением на 10*log10(e) = 4.343)
+    loss_factor_np = loss_factor / 4.343
+    t_perp_eff = t_perp * np.exp(-0.5 * loss_factor_np * (freq_th ** loss_exponent))
+    t_par_eff = t_par * np.exp(-0.5 * loss_factor_np * (freq_th ** loss_exponent))
     
     if scenario == 'A':
         T_total = np.abs(t_perp_eff)**2 * np.cos(angle_rad)**2 + np.abs(t_par_eff)**2 * np.sin(angle_rad)**2
