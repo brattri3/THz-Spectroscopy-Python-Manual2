@@ -172,10 +172,12 @@ def transmission_two_polarizers(theta: float, p_over_lambda: float, d_over_p: fl
 
 
 def transmission_db_modified(theta_deg: float, p: float, d: float, freq_THz: float, 
-                             period_scale: float, loss_factor: float, N: int = 15) -> float:
+                             period_scale: float, loss_factor: float, N: int = 15,
+                             loss_exponent: float = 1.0) -> float:
     """
     Модифицированная модель пропускания в дБ с учетом масштабного множителя
-    периода решетки (period_scale) и частотно-зависимых потерь (loss_factor).
+    периода решетки (period_scale) и частотно-зависимых потерь (loss_factor)
+    по обобщенному степенному закону затухания с показателем (loss_exponent).
     """
     if freq_THz <= 0:
         return -1e6
@@ -192,8 +194,8 @@ def transmission_db_modified(theta_deg: float, p: float, d: float, freq_THz: flo
     theta_rad = np.deg2rad(theta_deg)
     T_linear = transmission_two_polarizers(theta_rad, p_over_lambda, d_over_p, N)
     
-    # Добавление частотно-зависимых потерь по закону Бугера-Ламберта-Бера
-    T_linear_mod = T_linear * np.exp(-loss_factor * freq_THz)
+    # Добавление частотно-зависимых потерь по обобщенному степенному закону
+    T_linear_mod = T_linear * np.exp(-loss_factor * (freq_THz ** loss_exponent))
     
     return float(10 * np.log10(np.maximum(T_linear_mod, 1e-12)))
 
