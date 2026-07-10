@@ -192,8 +192,8 @@ def generate_plots():
     err_B_05 = (40.0 / np.log(10.0)) * tan_vals * d_theta_05
     err_B_10 = (40.0 / np.log(10.0)) * tan_vals * d_theta_10
     
-    plt.plot(angles_err, err_B_05, color=c_05, linestyle='-', linewidth=2, label='Limber Play $\\Delta\\theta = 0.5^\\circ$')
-    plt.plot(angles_err, err_B_10, color=c_10, linestyle='--', linewidth=2, label='Limber Play $\\Delta\\theta = 1.0^\\circ$')
+    plt.plot(angles_err, err_B_05, color='black', linestyle='-', linewidth=2, label='Limber Play $\\Delta\\theta = 0.5^\\circ$')
+    plt.plot(angles_err, err_B_10, color='black', linestyle='--', linewidth=2, label='Limber Play $\\Delta\\theta = 1.0^\\circ$')
     
     plt.xlabel('Rotator Angle $\\theta$ (deg)', fontsize=10)
     plt.ylabel('Attenuation Error $\\Delta A$ (dB)', fontsize=10)
