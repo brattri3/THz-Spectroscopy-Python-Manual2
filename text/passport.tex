@@ -92,14 +92,14 @@
 			\midrule
 			\textbf{Blanco model effective parameters\footnotemark} & \textbf{For calibration curve calculations (95\% CI):} \\
 			Effective grid period $P_{\text{eff}}$ & $15.50 \pm 0.05$~$\mu$m \\
-			Effective strip width $D_{\text{eff}}$\footnotemark & $5.66 \pm 0.24$~$\mu$m \\
-			Ohmic loss factor $loss\_factor$ & $0.1345 \pm 0.0080$ dB/THz \\
-			Systematic angular offset $\theta_{\text{offset}}$ & $-0.45^\circ \pm 0.08^\circ$ (rotator backlash compensation) \\
-			Model approximation error (RMSE) & $\pm 1.4$ dB (dynamic range up to $-45$ dB) \\
+			Effective strip width $D_{\text{eff}}$\footnotemark & $5.67 \pm 0.08$~$\mu$m (drift-filtered ensemble mean) \\
+			Ohmic loss factor $loss\_factor$ & $0.368 \pm 0.045$ dB/THz$^{1.58}$ (power-law exponent $\gamma = 1.58$) \\
+			Systematic angular offset $\theta_{\text{offset}}$ & $-0.45^\circ \pm 0.08^\circ$ / $+0.96^\circ \pm 0.06^\circ$ (configuration dependent) \\
+			Model approximation error (RMSE) & $\pm 1.39$ dB (dynamic range up to $-45$ dB) \\
 			\bottomrule
 		\end{tabularx}
 	\end{table}
-	\footnotetext{\scriptsize The Blanco model maps a cylindrical wire grid to an equivalent flat strip grid. Electrodynamically, a round wire of nominal diameter $D = 11.0$~$\mu$m interacts with THz radiation similarly to a flat metal strip of width $d \approx D/2$, resulting in a smaller effective width $D_{\text{eff}} \approx 5.66$~$\mu$m. See: A. Blanco, S. Fonti, and A. Piacente, "Transmission coefficients of free-standing wire grids in the far infrared: A theoretical approach for easy computation," \textit{Int. J. Infrared Millim. Waves}, vol. 7, no. 11, pp. 1711–1722, Nov. 1986.}
+	\footnotetext{\scriptsize The Blanco model maps a cylindrical wire grid to an equivalent flat strip grid. Electrodynamically, a round wire of nominal diameter $D = 11.0$~$\mu$m interacts with THz radiation similarly to a flat metal strip of width $d \approx D/2$, resulting in a smaller effective width $D_{\text{eff}} \approx 5.67$~$\mu$m. The ohmic loss factor incorporates a power-law frequency dependence $e^{-\alpha \nu^\gamma}$ with $\gamma=1.58$ to physically capture the transition from skin-effect absorption ($\propto \nu^{0.5}$) to Rayleigh scattering on grid edge imperfections ($\propto \nu^4$). See: A. Blanco, S. Fonti, and A. Piacente, "Transmission coefficients of free-standing wire grids in the far infrared: A theoretical approach for easy computation," \textit{Int. J. Infrared Millim. Waves}, vol. 7, no. 11, pp. 1711–1722, Nov. 1986.}
 	
 	\vspace{-0.5em}
 	
@@ -126,7 +126,7 @@
 	\vspace{0.2em}
 	
 	\noindent\textbf{4. Attenuator Application Scenarios} \\
-	Depending on the receiver type, the power transmission $T(\theta, \nu)$ is calculated via the Blanco model\textsuperscript{*}, where $t_{\perp}(\nu)$, $t_{\parallel}(\nu)$ are complex amplitude transmission coefficients, $\theta_{\text{offset}}$ is the systematic angular offset, and $T_{\text{noise}}$ is the noise floor:
+	Depending on the receiver type, the power transmission $T(\theta, \nu)$ is calculated via the Blanco model\textsuperscript{*}, where $t_{\perp}(\nu) = t_{\perp,0}(\nu) e^{-\frac{1}{2}\alpha \nu^{\gamma}}$, $t_{\parallel}(\nu) = t_{\parallel,0}(\nu) e^{-\frac{1}{2}\alpha \nu^{\gamma}}$ are loss-corrected complex amplitude transmission coefficients ($t_{\perp,0}, t_{\parallel,0}$ are pure electrodynamic Blanco coefficients, $\alpha = 0.0847$~Np/THz$^\gamma$, $\gamma = 1.58$), $\theta_{\text{offset}}$ is the systematic angular offset, and $T_{\text{noise}}$ is the noise floor:
 	\begin{itemize}[leftmargin=0.6cm, itemsep=2pt, parsep=0pt, topsep=2pt]
 		\item \textbf{Scenario A} (Bolometer / Golay Cell --- polarization-insensitive detector): \\
 		$T(\theta, \nu) = |t_{\perp}(\nu)|^2 \cos^2(\theta - \theta_{\text{offset}}) + |t_{\parallel}(\nu)|^2 \sin^2(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$
