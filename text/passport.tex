@@ -1,13 +1,13 @@
 % !TeX program = xelatex
 % ============================================================
-% passport.tex - Технический паспорт и калибровочное свидетельство
+% passport.tex - Technical Passport and Calibration Certificate
 % ============================================================
 \documentclass[11pt]{article}
 
 \usepackage{myconfig}
 \usepackage{booktabs}
 
-% Локально сужаем поля для строгого размещения всего материала на 2 страницах
+% Narrow fields locally to strictly fit everything on 2 pages
 \geometry{
 	left=1.4cm,
 	right=1.4cm,
@@ -17,13 +17,13 @@
 	footskip=0.4cm
 }
 
-\singlespacing % Одинарный интервал для компактности
+\singlespacing % Single line spacing for compact layout
 
 \begin{document}
-	\pagestyle{empty} % Убираем нумерацию страниц для бланка паспорта
+	\pagestyle{empty} % Remove page numbers for certificate template
 	
 	% ==========================================
-	% СТРАНИЦА 1: ТИТУЛЬНЫЙ БЛАНК И ХАРАКТЕРИСТИКИ
+	% PAGE 1: TITLE BLOCK & SPECIFICATIONS
 	% ==========================================
 	\noindent
 	\begin{minipage}[c]{0.26\textwidth}
@@ -34,12 +34,12 @@
 	\begin{minipage}[c]{0.72\textwidth}
 		\vspace{0pt}
 		\raggedleft
-		{\large\bfseries ООО «Тидекс»} \\
-		{\small Сектор спектральных исследований} \\
+		{\large\bfseries Tydex LLC} \\
+		{\small Spectral Research Department} \\
 		\vspace{0.4em}
-		{\color{headerblue}\large\bfseries ТЕХНИЧЕСКИЙ ПАСПОРТ И КАЛИБРОВОЧНОЕ СВИДЕТЕЛЬСТВО} \\
-		{\color{headerblue}\Large\bfseries Прецизионный терагерцовый аттенюатор} \\
-		{\small Модель: \textbf{ATT-11-16-CA85} \quad | \quad Серийный №: \textbf{\#02721}}
+		{\color{headerblue}\large\bfseries TECHNICAL PASSPORT AND CALIBRATION CERTIFICATE} \\
+		{\color{headerblue}\Large\bfseries Precision Terahertz Attenuator} \\
+		{\small Model: \textbf{ATT-11-16-CA85} \quad | \quad Serial No: \textbf{\#02721}}
 	\end{minipage}
 	
 	\vspace{0.6em}
@@ -49,8 +49,8 @@
 	\noindent
 	\begin{minipage}[t]{0.74\textwidth}
 		\vspace{0pt}
-		\noindent\textbf{1. Назначение и конструкция прибора} \\
-		Прецизионный терагерцовый аттенюатор \mycode{ATT-11-16-CA85} (световая апертура 85~мм) состоит из двух независимых проволочных сеток. На Рисунке 1 приведена схема прохождения излучения через решетки $P_1$ и $P_2$. Первый поляризатор ориентируется по вектору поляризации падающего пучка (угол $\theta_1 = 0^\circ$), а вращаемый выходной поляризатор (анализатор) поворачивается на угол $\theta_2 = \theta$. Вносимое затухание регулируется изменением относительного угла $\theta = \theta_2 - \theta_1$. Прибор индивидуально откалиброван для работы в диапазоне частот от 0.05 до 2.0 ТГц ($\lambda > 150$~мкм).
+		\noindent\textbf{1. Application and Design} \\
+		The \mycode{ATT-11-16-CA85} precision terahertz attenuator (clear aperture 85~mm) consists of two independent wire-grid polarizers. Figure 1 shows the experimental setup scheme for THz radiation transmission through grids $P_1$ and $P_2$. The first polarizer is aligned with the polarization vector of the incident beam (angle $\theta_1 = 0^\circ$), while the rotatable polarizer (analyzer) is rotated by an angle of $\theta_2 = \theta$. The introduced attenuation is controlled by varying the relative angle $\theta = \theta_2 - \theta_1$. The device is individually calibrated for the frequency range from 0.05 to 2.0 THz ($\lambda > 150$~$\mu$m).
 	\end{minipage}
 	\hfill
 	\begin{minipage}[t]{0.23\textwidth}
@@ -58,111 +58,111 @@
 		\centering
 		\includegraphics[width=\textwidth]{passport_microphoto}
 		\vspace{-0.3em}
-		\\ {\tiny Фото намотки решетки (шаг $15.93 \pm 5.03$ мкм)}
+		\\ {\tiny Grid structure photo (period $15.93 \pm 5.03$ $\mu$m)}
 	\end{minipage}
 	
 	\vspace{0.5em}
 	
-	\noindent\textbf{2. Технические и калибровочные характеристики}
+	\noindent\textbf{2. Technical and Calibration Specifications}
 	\begin{table}[H]
 		\centering
 		\small
 		\begin{tabularx}{\textwidth}{lX}
 			\toprule
-			\textbf{Параметр} & \textbf{Значение / Характеристика} \\
+			\textbf{Parameter} & \textbf{Value / Specification} \\
 			\midrule
-			Световая апертура (диаметр оправы) & 85~мм \\
-			Номинальный шаг решетки $P$ / диаметр проволоки $D$ & $16.0$~мкм / $11.0$~мкм \\
-			Измеренный геометрический шаг $P_{\text{geom}}$ (по фото) & $15.93 \pm 5.03$~мкм ($\pm 31.6\%$, класс качества «А») \\
-			Рабочий диапазон частот калибровки & 0.05 -- 2.0 ТГц \\
+			Clear aperture (holder diameter) & 85~mm \\
+			Nominal grid period $P$ / wire diameter $D$ & $16.0$~$\mu$m / $11.0$~$\mu$m \\
+			Measured geometric period $P_{\text{geom}}$ (via photo) & $15.93 \pm 5.03$~$\mu$m ($\pm 31.6\%$, quality class "A") \\
+			Calibration frequency range & 0.05 -- 2.0 THz \\
 			\midrule
-			\textbf{Эффективные параметры модели Бланко [1]} & \textbf{Для расчета калибровочных кривых (95\% ДИ):} \\
-			Эффективный шаг решетки $P_{\text{eff}}$ & $15.50 \pm 0.05$~мкм \\
-			Эффективный диаметр проволоки $D_{\text{eff}}$ & $5.66 \pm 0.24$~мкм \\
-			Коэффициент вносимых потерь $loss\_factor$ & $0.1345 \pm 0.0080$ дБ/ТГц \\
-			Систематический угловой сдвиг $\theta_{\text{offset}}$ & $-0.45^\circ \pm 0.08^\circ$ (люфт лимба ротатора) \\
-			Погрешность аппроксимации модели (RMSE) & $\pm 1.4$ дБ (динамический диапазон до $-45$ дБ) \\
+			\textbf{Blanco model effective parameters [1]} & \textbf{For calibration curve calculations (95\% CI):} \\
+			Effective grid period $P_{\text{eff}}$ & $15.50 \pm 0.05$~$\mu$m \\
+			Effective wire diameter $D_{\text{eff}}$ & $5.66 \pm 0.24$~$\mu$m \\
+			Ohmic loss factor $loss\_factor$ & $0.1345 \pm 0.0080$ dB/THz \\
+			Systematic angular offset $\theta_{\text{offset}}$ & $-0.45^\circ \pm 0.08^\circ$ (rotator backlash compensation) \\
+			Model approximation error (RMSE) & $\pm 1.4$ dB (dynamic range up to $-45$ dB) \\
 			\bottomrule
 		\end{tabularx}
 	\end{table}
 	
 	\vspace{0.3em}
 	
-	\noindent\textbf{3. Схема установки и методология эксперимента} \\
-	Калибровка проведена на терагерцовом спектрометре временного разрешения (TDS) Menlo Tera K8. Излучение имело строго горизонтальную линейную поляризацию. Схема прохождения приведена на Рисунке 1.
+	\noindent\textbf{3. Experimental Setup and Methodology} \\
+	The calibration of the attenuator was performed on a Menlo Tera K8 time-domain terahertz spectrometer (THz-TDS). The incident radiation possessed horizontal linear polarization. The experimental transmission scheme is shown in Figure 1.
 	
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.62\textwidth]{fig0_1}
 		\vspace{-0.5em}
-		\caption{Схема экспериментальной установки для калибровки аттенюатора с обозначением углов поляризатора $\theta_1$ и анализатора $\theta_2$.}
+		\caption{Experimental setup scheme for attenuator calibration with polarizer angle $\theta_1$ and analyzer angle $\theta_2$.}
 		\label{fig:scheme}
 	\end{figure}
 	
 	\vspace{-0.8em}
 	\noindent\vfill
-	\noindent\scriptsize{\textbf{Литература:} [1] A. Blanco, S. Fonti, and A. Piacente, "Transmission coefficients of free-standing wire grids in the far infrared: A theoretical approach for easy computation," \textit{Int. J. Infrared Millim. Waves}, vol. 7, no. 11, pp. 1711–1722, Nov. 1986.}
+	\noindent\scriptsize{\textbf{References:} [1] A. Blanco, S. Fonti, and A. Piacente, "Transmission coefficients of free-standing wire grids in the far infrared: A theoretical approach for easy computation," \textit{Int. J. Infrared Millim. Waves}, vol. 7, no. 11, pp. 1711–1722, Nov. 1986.}
 	
 	\newpage
 	
 	% ==========================================
-	% СТРАНИЦА 2: КАЛИБРОВОЧНЫЕ ГРАФИКИ И ПОГРЕШНОСТИ
+	% PAGE 2: CALIBRATION CURVES & ERROR ANALYSIS
 	% ==========================================
 	\begin{center}
-		{\color{headerblue}\large\bfseries КАЛИБРОВОЧНЫЕ КАРТЫ И ПОГРЕШНОСТИ АТТЕНЮАТОРА}
+		{\color{headerblue}\large\bfseries CALIBRATION CARDS AND ATTENUATOR ERRORS}
 	\end{center}
 	
 	\vspace{0.3em}
 	
-	\noindent\textbf{4. Сценарии применения аттенюатора} \\
-	В зависимости от типа приемника вносимое ослабление рассчитывается по одному из сценариев:
+	\noindent\textbf{4. Attenuator Application Scenarios} \\
+	Depending on the receiver type, the introduced attenuation is calculated according to one of the following scenarios:
 	\begin{enumerate}[leftmargin=0.8cm, label=\Alph*., itemsep=1pt]
-		\item \textbf{Сценарий А (Болометр / Ячейка Голея) --- нечувствительный к поляризации приемник}: \\
-		Регистрируется полная прошедшая мощность. Затухание подчиняется закону Малюса:
+		\item \textbf{Scenario A (Bolometer / Golay Cell) --- polarization-insensitive detector}: \\
+		Registers the total transmitted power. The transmission obeys the Malus law:
 		$T(\theta) = T_{\text{open}} \cos^2(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$.
 		
-		\item \textbf{Сценарий Б (ФПА Menlo Tera K8) --- чувствительный к поляризации приемник}: \\
-		Приемник реагирует только на горизонтальную компоненку поля. Затухание подчиняется закону Малюса в квадрате:
+		\item \textbf{Scenario B (PCA Menlo Tera K8) --- polarization-sensitive detector}: \\
+		The detector is sensitive only to the horizontal field component. The transmission follows the squared Malus law:
 		$T(\theta) = T_{\text{open}} \cos^4(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$.
 	\end{enumerate}
 	
 	\vspace{0.3em}
-	\noindent\textbf{5. Калибровочные кривые пропускания и ослабления} \\
-	Для ручной настройки затухания используйте графические кривые на Рисунке 2. Чтобы установить требуемое затухание $A$ (в дБ), найдите его на вертикальной шкале Рисунка 2 (справа или слева) и определите соответствующий угол $\theta$. На левой панели приведена линейная шкала для малых затуханий ($0^\circ - 60^\circ$), на правой панели — децибельная шкала для глубоких затуханий ($30^\circ - 90^\circ$). Экспериментальные точки Menlo на Рисунке 2 соответствуют измерениям для Сценария Б и подтверждают точность модели Бланко.
+	\noindent\textbf{5. Calibration Transmission and Attenuation Curves} \\
+	For manual attenuation adjustment, use the graphical curves in Figure 2. To set the required attenuation $A$ (in dB), locate the target value on the vertical scale of Figure 2 (either right or left) and find the corresponding rotator angle $\theta$. The left panel shows the linear transmission scale for low attenuation ($0^\circ - 60^\circ$), while the right panel displays the decibel scale for deep attenuation ($30^\circ - 90^\circ$). The Menlo experimental data points in Figure 2 correspond to the Scenario B measurements and confirm the high accuracy of the Blanco model.
 	
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.88\textwidth]{passport_calibration}
 		\vspace{-0.6em}
-		\caption{Калибровочные кривые: малые затухания в линейной шкале (слева) и глубокие затухания в децибельной шкале (справа). Правые шкалы показывают альтернативные единицы измерения.}
+		\caption{Calibration curves: low attenuation in linear scale (left) and deep attenuation in decibel scale (right). Right axes display alternative units.}
 		\label{fig:calib}
 	\end{figure}
 	
 	\vspace{-0.8em}
-	\noindent\textbf{6. Анализ погрешности установки угла} \\
-	Из-за тригонометрического характера закона Малюса чувствительность затухания к погрешности лимба ротатора $\Delta \theta$ резко возрастает при углах $\theta > 70^\circ$. На Рисунке 3 приведена погрешность ослабления $\Delta A$ для Сценария Б при инструментальном люфте лимба ротатора $\Delta\theta = 0.5^\circ$ и $1.0^\circ$.
+	\noindent\textbf{6. Angular Position Error Analysis} \\
+	Due to the trigonometric nature of the Malus law, the sensitivity of the attenuation to the rotator angle error $\Delta \theta$ increases sharply at angles $\theta > 70^\circ$. Figure 3 shows the attenuation error $\Delta A$ for Scenario B under instrumental rotator backlashes of $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.
 	
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.42\textwidth]{passport_error}
 		\vspace{-0.6em}
-		\caption{Зависимость погрешности ослабления $\Delta A$ от угла установки при люфте лимба $\Delta\theta = 0.5^\circ$ и $1.0^\circ$.}
+		\caption{Attenuation error $\Delta A$ as a function of the rotator angle under rotator backlash values of $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.}
 		\label{fig:error}
 	\end{figure}
 	
 	\vspace{-0.8em}
-	\noindent\textbf{7. Программное обеспечение и физические ограничения} \\
-	Комплект поставки включает специализированное программное обеспечение для расчета затухания на любой частоте $\nu$ при любом угле $\theta$. Программа индивидуально откалибрована под данный прибор (серийный №~\textbf{\#02721}) на основе эффективных параметров $P_{\text{eff}}$, $D_{\text{eff}}$ и $\theta_{\text{offset}}$. ПО предоставляется по электронной почте. \\
-	\textit{Ограничения}: При частотах ниже 10 ГГц ($\lambda > 3$ см) геометрическая апертура оправы ($85$ мм) становится сопоставимой с длиной волны, что приводит к краевой дифракции пучка.
+	\noindent\textbf{7. Calculation Software and Physical Limitations} \\
+	The delivery package includes specialized software to calculate the exact attenuation at any frequency $\nu$ for any angle $\theta$. The software is individually calibrated for the specific device (Serial No. \#02721) using the effective parameters $P_{\text{eff}}$, $D_{\text{eff}}$, and $\theta_{\text{offset}}$. The software is distributed via email. \\
+	\textit{Limitations}: At frequencies below 10 GHz ($\lambda > 3$ cm), the holder's clear aperture (85 mm) becomes comparable to the wavelength, leading to beam diffraction at the edges.
 	
 	\vspace{0.5em}
 	\hrule
 	\vspace{0.5em}
 	\begin{center}
 		\small
-		Калибровка произведена: 29 июня 2026~г. \\
+		Calibration Date: June 29, 2026 \\
 		\vspace{0.4em}
-		\textbf{Сектор спектральных исследований ООО «Тидекс»} \hfill \textbf{Подпись поверителя: \underline{\hspace{4cm}}}
+		\textbf{Spectral Research Department, Tydex LLC} \hfill \textbf{Operator Signature: \underline{\hspace{4cm}}}
 	\end{center}
 	
 \end{document}
