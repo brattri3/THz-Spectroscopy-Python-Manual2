@@ -90,16 +90,18 @@
 			Measured geometric period $P_{\text{geom}}$ (via photo) & $15.93 \pm 5.03$~$\mu$m ($\pm 31.6\%$, quality class "A") \\
 			Calibration frequency range & 0.05 -- 2.0 THz \\
 			\midrule
-			\textbf{Blanco model effective parameters\footnotemark} & \textbf{For calibration curve calculations (95\% CI):} \\
+			\textbf{Blanco model effective parameters} & \textbf{For calibration curve calculations (95\% CI):} \\
 			Effective grid period $P_{\text{eff}}$ & $15.50 \pm 0.05$~$\mu$m \\
-			Effective strip width $D_{\text{eff}}$\footnotemark & $5.67 \pm 0.08$~$\mu$m (drift-filtered ensemble mean) \\
+			Effective strip width $D_{\text{eff}}$\footnotemark[1] & $5.67 \pm 0.08$~$\mu$m (drift-filtered ensemble mean) \\
 			Ohmic loss factor $loss\_factor$ & $0.368 \pm 0.045$ dB/THz$^{1.58}$ (power-law exponent $\gamma = 1.58$) \\
-			Systematic angular offset $\theta_{\text{offset}}$ & $-0.45^\circ \pm 0.08^\circ$ / $+0.96^\circ \pm 0.06^\circ$ (configuration dependent) \\
-			Model approximation error (RMSE) & $\pm 1.39$ dB (dynamic range up to $-45$ dB) \\
+			Systematic angular offset $\theta_{\text{offset}}$\footnotemark[2] & $-0.45^\circ \pm 0.08^\circ$ / $+0.96^\circ \pm 0.06^\circ$ (configuration dependent) \\
+			Model approximation error (RMSE)\footnotemark[3] & $\pm 1.39$ dB (dynamic range up to $-45$ dB) \\
 			\bottomrule
 		\end{tabularx}
 	\end{table}
-	\footnotetext{\scriptsize The Blanco model maps a cylindrical wire grid to an equivalent flat strip grid. Electrodynamically, a round wire of nominal diameter $D = 11.0$~$\mu$m interacts with THz radiation similarly to a flat metal strip of width $d \approx D/2$, resulting in a smaller effective width $D_{\text{eff}} \approx 5.67$~$\mu$m. The ohmic loss factor incorporates a power-law frequency dependence $e^{-\alpha \nu^\gamma}$ with $\gamma=1.58$ to physically capture the transition from skin-effect absorption ($\propto \nu^{0.5}$) to Rayleigh scattering on grid edge imperfections ($\propto \nu^4$). See: A. Blanco, S. Fonti, and A. Piacente, "Transmission coefficients of free-standing wire grids in the far infrared: A theoretical approach for easy computation," \textit{Int. J. Infrared Millim. Waves}, vol. 7, no. 11, pp. 1711–1722, Nov. 1986.}
+	\footnotetext[1]{\scriptsize The Blanco model maps a cylindrical wire grid to an equivalent flat strip grid. A round wire of nominal diameter $D = 11.0$~$\mu$m interacts similarly to a flat metal strip of width $d \approx D/2$, yielding $D_{\text{eff}} \approx 5.67$~$\mu$m. The loss factor incorporates a power-law frequency dependence $e^{-\alpha \nu^\gamma}$ with $\gamma=1.58$ to physically capture the transition from skin-effect absorption ($\propto \nu^{0.5}$) to Rayleigh scattering on grid edge imperfections ($\propto \nu^4$). See: Blanco et al., \textit{Int. J. Infrared Millim. Waves}, vol. 7, no. 11, 1986.}
+	\footnotetext[2]{\scriptsize The systematic angular offset is configuration-dependent: $-0.45^\circ \pm 0.08^\circ$ is the rotator alignment backlash offset when rotating the first polarizer, and $+0.96^\circ \pm 0.06^\circ$ is the offset when rotating the analyzer (second polarizer).}
+	\footnotetext[3]{\scriptsize The 2D residuals analysis shows that the model approximation error is dominated by unmodeled multiple inter-grid reflections and diffraction scattering at large angles ($\theta > 50^\circ$), whereas for small angles ($\theta < 45^\circ$) the local fit RMSE is under $\pm 0.1$ dB.}
 	
 	\vspace{-0.5em}
 	
