@@ -96,7 +96,7 @@
 			\textbf{Blanco 模型有效参数} & \textbf{用于校准曲线计算 (95\% 置信区间):} \\
 			有效线栅周期 $P_{\text{eff}}$ & $15.50 \pm 0.05$~$\mu$m \\
 			有效条带宽度 $D_{\text{eff}}$\footnotemark[1] & $5.67 \pm 0.08$~$\mu$m (消除漂移后的系综平均值) \\
-			欧姆损耗因子 $loss\_factor$ & $0.368 \pm 0.045$ dB/THz$^{1.58}$ (幂律指数 $\gamma = 1.58$) \\
+			欧姆损耗因子 $loss\_factor$ & $0.255 \pm 0.035$ dB/THz$^{1.58}$ (幂律指数 $\gamma = 1.58$) \\
 			系统角度偏差 $\theta_{\text{offset}}$ & $-0.45^\circ \pm 0.08^\circ$ (旋转台回程误差补偿) \\
 			模型近似误差 (RMSE)\footnotemark[2] & $\pm 1.39$ dB (动态范围最大可达 $-45$ dB) \\
 			\bottomrule
@@ -130,7 +130,7 @@
 	\vspace{0.2em}
 	
 	\noindent\textbf{4. 衰减器应用场景} \\
-	根据探测器类型，功率透射率 $T(\theta, \nu)$ 可通过 Blanco 模型\textsuperscript{*} 计算，其中 $t_{\perp}(\nu) = t_{\perp,0}(\nu) e^{-\frac{1}{2}\alpha \nu^{\gamma}}$ 和 $t_{\parallel}(\nu) = t_{\parallel,0}(\nu) e^{-\frac{1}{2}\alpha \nu^{\gamma}}$ 是经过损耗修正的复振幅透射系数（$t_{\perp,0}, t_{\parallel,0}$ 为纯电动力学 Blanco 系数，$\alpha = 0.0847$~Np/THz$^\gamma$，$\gamma = 1.58$），$\theta_{\text{offset}}$ 是系统角度偏差，而 $T_{\text{noise}}$ 是本底噪声：
+	根据探测器类型，功率透射率 $T(\theta, \nu)$ 可通过 Blanco 模型\textsuperscript{*} 计算，其中 $t_{\perp}(\nu) = t_{\perp,0}(\nu) e^{-\frac{1}{2}\alpha \nu^{\gamma}}$ 和 $t_{\parallel}(\nu) = t_{\parallel,0}(\nu) e^{-\frac{1}{2}\alpha \nu^{\gamma}}$ 是经过损耗修正的复振幅透射系数（$t_{\perp,0}, t_{\parallel,0}$ 为纯电动力学 Blanco 系数，$\alpha = 0.0587$~Np/THz$^\gamma$，$\gamma = 1.58$），$\theta_{\text{offset}}$ 是系统角度偏差，而 $T_{\text{noise}}$ 是本底噪声：
 	\begin{itemize}[leftmargin=0.6cm, itemsep=2pt, parsep=0pt, topsep=2pt]
 		\item \textbf{场景 A} （PCA Menlo Tera K8 —— 光电导天线相干偏振敏感探测器）： \\
 		$T(\theta, \nu) = \left| t_{\perp}(\nu) \cos^2(\theta - \theta_{\text{offset}}) + t_{\parallel}(\nu) \sin^2(\theta - \theta_{\text{offset}}) \right|^2 + T_{\text{noise}}$

@@ -26,7 +26,7 @@ plt.rcParams['legend.fontsize'] = 9
 # Оптимальные эффективные параметры калибровки для текущего аттенюатора ATT-11-16-CA85
 P_eff = 15.50 * 1e-6
 D_eff = 5.67 * 1e-6
-loss_factor = 0.368
+loss_factor = 0.255
 loss_exponent = 1.58
 offset_deg = -0.45
 c_light = 3e8
