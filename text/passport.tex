@@ -101,37 +101,35 @@
 	\end{table}
 	\footnotetext{\scriptsize The Blanco model maps a cylindrical wire grid to an equivalent flat strip grid. Electrodynamically, a round wire of nominal diameter $D = 11.0$~$\mu$m interacts with THz radiation similarly to a flat metal strip of width $d \approx D/2$, resulting in a smaller effective width $D_{\text{eff}} \approx 5.66$~$\mu$m. See: A. Blanco, S. Fonti, and A. Piacente, "Transmission coefficients of free-standing wire grids in the far infrared: A theoretical approach for easy computation," \textit{Int. J. Infrared Millim. Waves}, vol. 7, no. 11, pp. 1711–1722, Nov. 1986.}
 	
-	\vspace{-0.5em}
+	\vspace{-0.3em}
 	
+	% Two-column layout: Sections 3+4 on left, Figure 1 on right
 	\noindent
-	\begin{minipage}[t]{0.52\textwidth}
+	\begin{minipage}[t]{0.56\textwidth}
 		\vspace{0pt}
 		\noindent\textbf{3. Experimental Setup and Methodology} \\
-		The calibration of the attenuator was performed on a Menlo Tera K8 time-domain terahertz spectrometer (THz-TDS). The incident radiation possessed horizontal linear polarization. The experimental transmission scheme is shown in Figure 1.
+		The calibration of the attenuator was performed on a Menlo Tera K8 time-domain terahertz spectrometer (THz-TDS). The incident radiation possessed horizontal linear polarization. The experimental transmission scheme is shown in Figure~1.
+		
+		\vspace{0.4em}
+		\noindent\textbf{4. Attenuator Application Scenarios} \\
+		Depending on the receiver type, the power transmission $T(\theta, \nu)$ is calculated via the Blanco model\textsuperscript{*}:
+		\begin{enumerate}[leftmargin=0.6cm, label=\Alph*., itemsep=0pt, parsep=0pt, topsep=2pt]
+			\item \textbf{Scenario A} (Bolometer / Golay Cell --- polarization-insensitive): \\
+			$T = |t_{\perp}|^2 \cos^2(\theta - \theta_{\text{off}}) + |t_{\parallel}|^2 \sin^2(\theta - \theta_{\text{off}}) + T_{\text{n}}$
+			\item \textbf{Scenario B} (PCA Menlo Tera K8 --- polarization-sensitive): \\
+			$T = \left| t_{\perp} \cos^2(\theta - \theta_{\text{off}}) + t_{\parallel} \sin^2(\theta - \theta_{\text{off}}) \right|^2 + T_{\text{n}}$
+		\end{enumerate}
+		{\footnotesize where $t_{\perp}(\nu)$, $t_{\parallel}(\nu)$ are amplitude transmission coefficients; $\theta_{\text{off}}\equiv\theta_{\text{offset}}$; $T_{\text{n}}\equiv T_{\text{noise}}$.}
 	\end{minipage}
 	\hfill
-	\begin{minipage}[t]{0.44\textwidth}
+	\begin{minipage}[t]{0.40\textwidth}
 		\vspace{0pt}
 		\centering
 		\includegraphics[width=\textwidth]{fig0_1}
 		\vspace{-0.6em}
-		\captionof{figure}{Experimental setup scheme with angles $\theta_1$ and $\theta_2$.}
+		\captionof{figure}{Experimental setup scheme with polarizer angle $\theta_1$ and analyzer angle $\theta_2$.}
 		\label{fig:scheme}
 	\end{minipage}
-	
-	\vspace{0.4em}
-	
-	\noindent\textbf{4. Attenuator Application Scenarios} \\
-	Depending on the receiver type, the introduced power transmission $T(\theta, \nu)$ at frequency $\nu$ is calculated according to the electrodynamic Blanco model\textsuperscript{*} using one of the following scenarios:
-	\begin{enumerate}[leftmargin=0.8cm, label=\Alph*., itemsep=1pt, parsep=0pt]
-		\item \textbf{Scenario A (Bolometer / Golay Cell) --- polarization-insensitive detector}: Registers the total transmitted power: \\
-		$T(\theta, \nu) = |t_{\perp}(\nu)|^2 \cos^2(\theta - \theta_{\text{offset}}) + |t_{\parallel}(\nu)|^2 \sin^2(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$, 
-		where $|t_{\perp}(\nu)|^2$ and $|t_{\parallel}(\nu)|^2$ are the power transmission coefficients of the grids for perpendicular and parallel polarizations, respectively, calculated via the Blanco model\textsuperscript{*}.
-		
-		\item \textbf{Scenario B (PCA Menlo Tera K8) --- polarization-sensitive detector}: The detector registers only the horizontal component of the electric field: \\
-		$T(\theta, \nu) = \left| t_{\perp}(\nu) \cos^2(\theta - \theta_{\text{offset}}) + t_{\parallel}(\nu) \sin^2(\theta - \theta_{\text{offset}}) \right|^2 + T_{\text{noise}}$, 
-		where $t_{\perp}(\nu)$ and $t_{\parallel}(\nu)$ are the complex amplitude transmission coefficients calculated via the Blanco model\textsuperscript{*}.
-	\end{enumerate}
 	
 	\newpage
 	
