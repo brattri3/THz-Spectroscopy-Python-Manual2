@@ -46,9 +46,9 @@
 		{\small Model: \textbf{ATT-11-16-CA85} \quad | \quad Serial No: \textbf{\#02721}}
 	\end{minipage}
 	
-	\vspace{0.4em}
+	\vspace{0.5em}
 	\hrule
-	\vspace{0.4em}
+	\vspace{0.5em}
 	
 	\noindent
 	\begin{minipage}[t]{0.74\textwidth}
@@ -119,15 +119,15 @@
 	\vspace{0.2em}
 	
 	\noindent\textbf{4. Attenuator Application Scenarios} \\
-	Depending on the receiver type, the introduced attenuation is calculated according to one of the following scenarios:
+	Depending on the receiver type, the introduced power transmission $T(\theta, \nu)$ at frequency $\nu$ is calculated according to the electrodynamic Blanco model [1] using one of the following scenarios:
 	\begin{enumerate}[leftmargin=0.8cm, label=\Alph*., itemsep=1pt]
-		\item \textbf{Scenario A (Bolometer / Golay Cell) --- polarization-insensitive detector}: \\
-		Registers the total transmitted power. The transmission obeys the Malus law:
-		$T(\theta) = T_{\text{open}} \cos^2(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$.
+		\item \textbf{Scenario A (Bolometer / Golay Cell) --- polarization-insensitive detector}: Registers the total transmitted power:
+		$T(\theta, \nu) = |t_{\perp}(\nu)|^2 \cos^2(\theta - \theta_{\text{offset}}) + |t_{\parallel}(\nu)|^2 \sin^2(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$, 
+		where $|t_{\perp}(\nu)|^2$ and $|t_{\parallel}(\nu)|^2$ are the power transmission coefficients of the grids for perpendicular and parallel polarizations, respectively, calculated via the Blanco model [1].
 		
-		\item \textbf{Scenario B (PCA Menlo Tera K8) --- polarization-sensitive detector}: \\
-		The detector is sensitive only to the horizontal field component. The transmission follows the squared Malus law:
-		$T(\theta) = T_{\text{open}} \cos^4(\theta - \theta_{\text{offset}}) + T_{\text{noise}}$.
+		\item \textbf{Scenario B (PCA Menlo Tera K8) --- polarization-sensitive detector}: The detector registers only the horizontal component of the electric field:
+		$T(\theta, \nu) = \left| t_{\perp}(\nu) \cos^2(\theta - \theta_{\text{offset}}) + t_{\parallel}(\nu) \sin^2(\theta - \theta_{\text{offset}}) \right|^2 + T_{\text{noise}}$, 
+		where $t_{\perp}(\nu)$ and $t_{\parallel}(\nu)$ are the complex amplitude transmission coefficients calculated via the Blanco model [1].
 	\end{enumerate}
 	
 	\vspace{0.2em}
@@ -144,7 +144,7 @@
 	
 	\vspace{-0.9em}
 	\noindent\textbf{6. Angular Position Error Analysis} \\
-	Due to the trigonometric nature of the Malus law, the sensitivity of the attenuation to the rotator angle error $\Delta \theta$ increases sharply at angles $\theta > 70^\circ$. Figure 3 shows the attenuation error $\Delta A$ for Scenario B under instrumental rotator backlasses of $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.
+	Due to the trigonometric nature of the Malus law, the sensitivity of the attenuation to the rotator angle error $\Delta \theta$ increases sharply at angles $\theta > 70^\circ$. Figure 3 shows the attenuation error $\Delta A$ for Scenario B under instrumental rotator backlashes of $\Delta\theta = 0.5^\circ$ and $1.0^\circ$.
 	
 	\begin{figure}[H]
 		\centering
