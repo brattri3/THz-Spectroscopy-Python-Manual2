@@ -175,40 +175,79 @@ def build_theory_curve(angles, p_eff_m, d_eff_m, alpha, gamma,
                           freqs_THz, weights, theta_offset_deg, eps_floor)
         for a in angles])
 
-def param_uncertainties(loss_fn, x_opt, param_names, eps=1e-5):
-    """
-    Оценка стандартных отклонений параметров через диагональ обратного
-    гессиана (метод конечных разностей).
-    """
-    n   = len(x_opt)
-    H   = np.zeros((n, n))
-    f0  = loss_fn(x_opt)
-    dx  = np.abs(x_opt) * eps + 1e-10
-    total_calls = n * n
-    call_idx    = 0
 
-    log(f"  Гессиан: {n}×{n} = {total_calls} пар вычислений...")
-    for i in range(n):
-        for j in range(n):
-            x1, x2, x3, x4 = x_opt.copy(), x_opt.copy(), x_opt.copy(), x_opt.copy()
-            x1[i] += dx[i]; x1[j] += dx[j]
-            x2[i] += dx[i]; x2[j] -= dx[j]
-            x3[i] -= dx[i]; x3[j] += dx[j]
-            x4[i] -= dx[i]; x4[j] -= dx[j]
-            H[i, j] = (loss_fn(x1) - loss_fn(x2) - loss_fn(x3) + loss_fn(x4)) \
-                      / (4 * dx[i] * dx[j])
-            call_idx += 1
-            if call_idx % max(1, total_calls // 5) == 0:
-                pct = 100 * call_idx / total_calls
-                log(f"    {pct:.0f}%  [{call_idx}/{total_calls}]  "
-                    f"({param_names[i]} x {param_names[j]})")
+def check_bounds(x_opt, bounds, param_names, scales=None):
+    """
+    Проверяет, достиг ли какой-либо параметр границы допустимого диапазона.
+    Если да — выводит предупреждение, т.к. в этом случае оценка погрешностей
+    через гессиан теряет смысл, а истинный минимум лежит вне заданного диапазона.
+    Возвращает список булевых значений: True = параметр на границе.
+    """
+    if scales is None:
+        scales = [1.0] * len(x_opt)
+    at_bound = []
+    for i, ((lo, hi), name, sc) in enumerate(zip(bounds, param_names, scales)):
+        tol = (hi - lo) * 1e-6
+        if x_opt[i] <= lo + tol:
+            log(f"  [!] {name} = {x_opt[i]*sc:.4g} — упёрся в НИЖНЮЮ границу "
+                f"({lo*sc:.4g}). Расширьте диапазон вниз!")
+            at_bound.append(True)
+        elif x_opt[i] >= hi - tol:
+            log(f"  [!] {name} = {x_opt[i]*sc:.4g} — упёрся в ВЕРХНЮЮ границу "
+                f"({hi*sc:.4g}). Расширьте диапазон вверх!")
+            at_bound.append(True)
+        else:
+            at_bound.append(False)
+    return at_bound
 
+
+def param_uncertainties_from_lbfgs(res, n_data, param_names, bounds,
+                                    scales=None):
+    """
+    Оценка стандартных отклонений параметров через приближение обратного
+    гессиана, накопленное алгоритмом L-BFGS-B в процессе оптимизации.
+
+    Преимущества перед числовым гессианом:
+      - Вычисляется мгновенно (нет дополнительных вызовов целевой функции)
+      - Не взрывается при сингулярных матрицах
+      - Корректно работает для свободных (не застрявших на границах) параметров
+
+    Ограничение: для параметров на границе σ формально = 0 или NaN —
+    это ожидаемо, см. предупреждения check_bounds().
+
+    n_data    : число экспериментальных точек (нужно для нормировки)
+    """
+    n   = len(res.x)
+    f0  = res.fun    # значение целевой функции в минимуме
+
+    # L-BFGS-B хранит res.hess_inv как LinearOperator или LbfgsInvHessProduct
     try:
-        H_inv = np.linalg.inv(H)
-        sigmas = np.sqrt(np.maximum(np.diag(H_inv) * f0 / max(len(x_opt) - n, 1), 0))
-    except np.linalg.LinAlgError:
-        sigmas = np.full(n, np.nan)
+        H_inv_dense = np.array(res.hess_inv.todense())
+    except AttributeError:
+        try:
+            H_inv_dense = np.eye(n) * res.hess_inv
+        except Exception:
+            log("  [WARN] Не удалось получить приближение обратного гессиана.")
+            return np.full(n, np.nan)
+
+    # Оценка дисперсии остатков: s² = f0 / (n_data - n)
+    dof = max(n_data - n, 1)
+    var_scale = f0 / dof
+
+    diag = np.diag(H_inv_dense)
+    sigmas = np.sqrt(np.maximum(diag * var_scale, 0.0))
+
+    # Параметры на границе: их σ из L-BFGS-B будет ~0 — заменяем на NaN,
+    # чтобы явно показать ненадёжность
+    if bounds is not None:
+        for i, (lo, hi) in enumerate(bounds):
+            tol = (hi - lo) * 1e-6
+            if res.x[i] <= lo + tol or res.x[i] >= hi - tol:
+                sigmas[i] = float('nan')
+
     return sigmas
+
+
 
 # ─── БЛОК 4: ФУНКЦИИ ОТРИСОВКИ ───────────────────────────────────────────────
 
@@ -307,11 +346,14 @@ def main():
                     callback=cb1,
                     options={'maxiter': 2000, 'ftol': 1e-14, 'gtol': 1e-10})
     p1, d1, a1, g1 = res1.x
-    log(f"  Оптимизация завершена за {iter_count[0]} итераций.")
+    log(f"  Завершено за {iter_count[0]} итераций. success={res1.success}")
 
-    log("  Вычисление погрешностей (гессиан)...")
-    names1 = ['p','d','α','γ']
-    sigma1 = param_uncertainties(objective_linear, res1.x, names1)
+    log("  Проверка границ и вычисление погрешностей...")
+    names1  = ['p_eff', 'd_eff', 'α', 'γ']
+    scales1 = [1e6,     1e6,     1.0,   1.0]
+    check_bounds(res1.x, bnd_s1, names1, scales1)
+    sigma1 = param_uncertainties_from_lbfgs(
+                 res1, len(angles_exp), names1, bnd_s1, scales1)
     sp1, sd1, sa1, sg1 = sigma1
 
     T_th_s1   = build_theory_curve(angles_exp, p1, d1, a1, g1, freqs_THz, weights)
@@ -384,11 +426,14 @@ def main():
                     callback=cb2,
                     options={'maxiter': 2000, 'ftol': 1e-14, 'gtol': 1e-10})
     p2, d2, a2, g2 = res2.x
-    log(f"  Оптимизация завершена за {iter_count[0]} итераций.")
+    log(f"  Завершено за {iter_count[0]} итераций. success={res2.success}")
 
-    log("  Вычисление погрешностей (гессиан)...")
-    names2 = ['p','d','α','γ']
-    sigma2 = param_uncertainties(objective_db, res2.x, names2)
+    log("  Проверка границ и вычисление погрешностей...")
+    names2  = ['p_eff', 'd_eff', 'α', 'γ']
+    scales2 = [1e6,     1e6,     1.0,   1.0]
+    check_bounds(res2.x, bnd_s2, names2, scales2)
+    sigma2 = param_uncertainties_from_lbfgs(
+                 res2, len(angles_exp), names2, bnd_s2, scales2)
     sp2, sd2, sa2, sg2 = sigma2
 
     T_th_s2    = build_theory_curve(angles_exp, p2, d2, a2, g2, freqs_THz, weights)
@@ -457,11 +502,14 @@ def main():
                     callback=cb3,
                     options={'maxiter': 3000, 'ftol': 1e-15, 'gtol': 1e-11})
     p3, d3, a3, g3, th3, eps3 = res3.x
-    log(f"  Оптимизация завершена за {iter_count[0]} итераций.")
+    log(f"  Завершено за {iter_count[0]} итераций. success={res3.success}")
 
-    log("  Вычисление погрешностей (гессиан)...")
-    names3 = ['p','d','α','γ','Δθ','ε']
-    sigma3 = param_uncertainties(objective_db_hw, res3.x, names3)
+    log("  Проверка границ и вычисление погрешностей...")
+    names3  = ['p_eff', 'd_eff', 'α', 'γ', 'Δθ', 'ε_floor']
+    scales3 = [1e6,     1e6,     1.0,   1.0,  1.0,   1.0]
+    check_bounds(res3.x, bnd_s3, names3, scales3)
+    sigma3 = param_uncertainties_from_lbfgs(
+                 res3, len(angles_exp), names3, bnd_s3, scales3)
     sp3, sd3, sa3, sg3, sth3, seps3 = sigma3
 
     T_th_s3    = build_theory_curve(angles_exp, p3, d3, a3, g3,
